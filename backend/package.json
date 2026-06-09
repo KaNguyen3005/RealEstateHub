@@ -1,0 +1,25 @@
+{
+  "name": "realestatehub-backend",
+  "version": "1.0.0",
+  "description": "Backend API for RealEstateHub",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "realestate",
+    "express",
+    "mongodb",
+    "backend"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.1"
+  }
+}
