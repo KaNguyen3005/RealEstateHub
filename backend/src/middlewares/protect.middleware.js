@@ -1,20 +1,7 @@
 const User = require("../models/User");
 const { verifyAccessToken } = require("../utils/token");
 const { createHttpError } = require("../utils/httpError");
-
-function extractBearerToken(authorizationHeader) {
-  if (!authorizationHeader) {
-    return null;
-  }
-
-  const [scheme, token] = String(authorizationHeader).split(" ");
-
-  if (scheme !== "Bearer" || !token) {
-    return null;
-  }
-
-  return token;
-}
+const { extractBearerToken } = require("../utils/authHeader");
 
 async function protect(req, res, next) {
   const accessToken = extractBearerToken(req.headers.authorization);
@@ -31,7 +18,15 @@ async function protect(req, res, next) {
     return next(createHttpError(401, "Invalid access token"));
   }
 
-  const user = await User.findById(payload.userId);
+  let user;
+
+  try {
+    user = await User.findById(payload.userId);
+  } catch (error) {
+    return next(
+      error.statusCode ? error : createHttpError(500, "Failed to verify access token")
+    );
+  }
 
   if (!user) {
     return next(createHttpError(401, "Invalid access token"));
@@ -46,6 +41,7 @@ async function protect(req, res, next) {
     userId: payload.userId,
     role: payload.role,
   };
+  req.auth = req.userToken;
 
   return next();
 }

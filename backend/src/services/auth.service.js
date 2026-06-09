@@ -1,12 +1,67 @@
 const User = require("../models/User");
-const { comparePassword } = require("../utils/password");
+const { comparePassword, hashPassword } = require("../utils/password");
 const {
   createAccessToken,
   createRefreshToken,
-  verifyAccessToken,
   verifyRefreshToken,
 } = require("../utils/token");
 const { createHttpError } = require("../utils/httpError");
+
+async function registerUser(input) {
+  const fullName = String(input?.fullName || "").trim();
+  const email = String(input?.email || "").trim().toLowerCase();
+  const password = String(input?.password || "");
+  const role = input?.role || "user";
+
+  if (!fullName || !email || !password) {
+    throw createHttpError(400, "Full name, email and password are required");
+  }
+
+  if (fullName.length < 2) {
+    throw createHttpError(400, "Full name must be at least 2 characters long");
+  }
+
+  if (password.length < 6) {
+    throw createHttpError(400, "Password must be at least 6 characters long");
+  }
+
+  if (!["user", "seller"].includes(role)) {
+    throw createHttpError(400, "Role must be user or seller");
+  }
+
+  const existingUser = await User.findOne({ email });
+
+  if (existingUser) {
+    throw createHttpError(409, "Email already exists");
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  const user = await User.create({
+    fullName,
+    email,
+    passwordHash,
+    role,
+    status: "active",
+  });
+
+  const tokenPayload = {
+    userId: String(user._id),
+    role: user.role,
+  };
+
+  const accessToken = createAccessToken(tokenPayload);
+  const refreshToken = createRefreshToken(tokenPayload);
+
+  user.refreshToken = refreshToken;
+  await user.save();
+
+  return {
+    user: user.toJSON(),
+    accessToken,
+    refreshToken,
+  };
+}
 
 async function loginUser(email, password) {
   const normalizedEmail = String(email || "").trim().toLowerCase();
@@ -121,35 +176,9 @@ async function logoutUser(refreshToken) {
   return { revoked: true };
 }
 
-async function getCurrentUser(accessToken) {
-  if (!accessToken) {
-    throw createHttpError(401, "Access token is required");
-  }
-
-  let payload;
-
-  try {
-    payload = verifyAccessToken(accessToken);
-  } catch (_error) {
-    throw createHttpError(401, "Invalid access token");
-  }
-
-  const user = await User.findById(payload.userId);
-
-  if (!user) {
-    throw createHttpError(401, "Invalid access token");
-  }
-
-  if (user.status === "blocked") {
-    throw createHttpError(403, "Your account has been blocked");
-  }
-
-  return user.toJSON();
-}
-
 module.exports = {
+  registerUser,
   loginUser,
   refreshUserSession,
   logoutUser,
-  getCurrentUser,
 };
