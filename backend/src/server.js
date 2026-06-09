@@ -4,6 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
+const healthRoutes = require("./routes/health.routes");
+const errorMiddleware = require("./middlewares/error.middleware");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -26,6 +28,9 @@ app.get("/", (req, res) => {
     message: "RealEstateHub backend is running"
   });
 });
+
+app.use("/api/health", healthRoutes);
+app.use(errorMiddleware);
 
 async function startServer() {
   try {
