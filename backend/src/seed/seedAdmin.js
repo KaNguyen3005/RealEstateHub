@@ -1,24 +1,14 @@
 const path = require("path");
-const crypto = require("crypto");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const connectDB = require("../config/db");
 const User = require("../models/User");
+const { hashPassword } = require("../utils/password");
 
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const ADMIN_EMAIL = process.env.ADMIN_SEED_EMAIL || "admin@realestatehub.local";
 const ADMIN_PASSWORD = process.env.ADMIN_SEED_PASSWORD || "Admin@123";
-
-async function hashPassword(password) {
-  // Dùng bcrypt nếu có sẵn, còn không thì fallback để seed vẫn chạy được trong giai đoạn đầu.
-  try {
-    const bcrypt = require("bcryptjs");
-    return await bcrypt.hash(password, 10);
-  } catch (_error) {
-    return crypto.createHash("sha256").update(password).digest("hex");
-  }
-}
 
 async function seedAdmin() {
   await connectDB();

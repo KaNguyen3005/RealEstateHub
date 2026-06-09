@@ -1,10 +1,10 @@
 const path = require("path");
-const crypto = require("crypto");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const connectDB = require("../config/db");
 const User = require("../models/User");
 const Property = require("../models/Property");
+const { hashPassword } = require("../utils/password");
 
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
@@ -145,15 +145,6 @@ function slugifyProperty(title, ownerId) {
     .replace(/^-+|-+$/g, "");
 
   return `${baseSlug}-${String(ownerId).slice(-6)}`;
-}
-
-async function hashPassword(password) {
-  try {
-    const bcrypt = require("bcryptjs");
-    return await bcrypt.hash(password, 10);
-  } catch (_error) {
-    return crypto.createHash("sha256").update(password).digest("hex");
-  }
 }
 
 async function upsertUser(userData) {
