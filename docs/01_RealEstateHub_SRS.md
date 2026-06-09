@@ -115,6 +115,7 @@ The main functions of the system are:
 - Chat with seller or admin
 - Admin approves, rejects, hides, or deletes listings
 - View dashboard statistics
+- Manage property lifecycle status, including sold and rented states
 ```
 
 ### 2.3 User Classes and Characteristics
@@ -162,6 +163,7 @@ Seller can:
 - Delete own property listing
 - View listing status
 - Chat with interested users
+- Mark own property as sold or rented when the workflow allows it
 ```
 
 #### Admin
@@ -232,6 +234,8 @@ The system shall allow sellers to create, update, delete, and manage real estate
 | FR-15 | The system shall allow admin to approve property listings. |
 | FR-16 | The system shall allow admin to reject property listings. |
 | FR-17 | The system shall allow admin to hide inappropriate property listings. |
+| FR-18 | The system shall support sold and rented as closed property statuses. |
+| FR-19 | The system shall prevent new chat conversations for sold or rented properties. |
 
 ### Property Data Fields
 
@@ -263,6 +267,8 @@ pending
 approved
 rejected
 hidden
+sold
+rented
 ```
 
 ---
@@ -315,6 +321,7 @@ The system shall provide a detailed page for each property.
 | FR-28 | The system shall display property location on a map. |
 | FR-29 | The system shall allow logged-in users to start a chat from the property detail page. |
 | FR-30 | The system shall allow logged-in users to add the property to favorites. |
+| FR-31 | The system shall disable or block chat actions when the property is sold or rented. |
 
 ---
 
@@ -379,6 +386,7 @@ The system shall allow users to chat with sellers or administrators in realtime.
 | FR-42 | The system shall display chat history. |
 | FR-43 | The system shall support message timestamps. |
 | FR-44 | The system shall show typing indicator if possible. |
+| FR-45 | The system shall block creating conversations and sending messages for closed properties. |
 
 ### Socket Events
 
@@ -469,6 +477,7 @@ The system shall include at least one feature implemented using **Next.js Server
 | FR-62 | The system shall validate contact request input using Zod. |
 | FR-63 | The system shall submit the contact request using Next.js Server Action. |
 | FR-64 | The system shall store the contact request or forward it to the backend API. |
+| FR-65 | The system shall treat contact request as a separate workflow from realtime conversation. |
 
 ---
 

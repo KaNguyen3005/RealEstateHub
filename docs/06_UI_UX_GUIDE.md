@@ -443,6 +443,8 @@ Status badges:
 | approved | Green |
 | rejected | Red |
 | hidden | Gray |
+| sold | Blue-gray with "Đã bán" label |
+| rented | Blue-gray with "Đã cho thuê" label |
 
 ---
 
@@ -691,6 +693,7 @@ UX rules:
 - Contact action should be easy to find.
 - Map should not block the main property information.
 - Gallery should work on mobile.
+- If the property is sold or rented, show a closed badge and disable the Start Chat button.
 ```
 
 ---
@@ -919,6 +922,7 @@ UX rules:
 - Show status badge clearly.
 - Explain pending status: "Waiting for admin approval".
 - Confirm before delete.
+- Show sold/rented status clearly so seller knows chat should be closed.
 ```
 
 ---
@@ -1032,6 +1036,7 @@ UX rules:
 - Show timestamp.
 - Disable input if socket disconnected.
 - Show reconnecting state.
+- If the linked property is sold or rented, show a closed-state banner and disable the message input.
 ```
 
 ---
@@ -1645,7 +1650,9 @@ const statusClass = {
   pending: "bg-amber-100 text-amber-700",
   approved: "bg-green-100 text-green-700",
   rejected: "bg-red-100 text-red-700",
-  hidden: "bg-slate-100 text-slate-700"
+  hidden: "bg-slate-100 text-slate-700",
+  sold: "bg-slate-200 text-slate-800",
+  rented: "bg-slate-200 text-slate-800"
 };
 ```
 

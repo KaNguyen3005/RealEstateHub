@@ -301,6 +301,7 @@ Implement Mongoose schemas and initial seed data.
 - Property images must contain 1 to 10 image URLs.
 - Favorite must be unique by userId + propertyId.
 - Message must be indexed by conversationId + createdAt.
+- Property status must include closed lifecycle values such as sold and rented.
 ```
 
 ### Acceptance Criteria
@@ -408,6 +409,7 @@ PATCH  /api/properties/:id/status
 ```text
 - Public users can only see approved properties.
 - New property status is pending by default.
+- Sold and rented properties are treated as closed and should be reflected in UI.
 - Seller can update/delete only own properties.
 - Admin can update/delete any property.
 - Compare API accepts maximum 3 property IDs.
@@ -419,6 +421,7 @@ PATCH  /api/properties/:id/status
 - Seller can create property.
 - New property has pending status.
 - Public listing only returns approved properties.
+- Closed properties show sold/rented badges in frontend lists and detail pages.
 - Search and filter work by keyword, city, type, purpose, price, and area.
 - Seller cannot update another seller's property.
 - Compare API returns latest approved property details.
@@ -540,6 +543,7 @@ Build public property pages, seller property management pages, compare, and favo
 - Users can view property detail.
 - Seller can create property from dashboard.
 - Seller can edit/delete own properties.
+- Property cards and detail pages must reflect sold/rented labels and disable chat entry points.
 - Compare page fetches latest details by IDs.
 - Favorite button works for authenticated users.
 
@@ -674,6 +678,7 @@ message_read
 
 - User can start chat from property detail.
 - Conversation is linked to property.
+- Chat creation is blocked when the property is sold or rented.
 - Message is saved to MongoDB.
 - Message appears realtime to the other participant.
 - Socket without token is rejected.
@@ -728,6 +733,7 @@ GET   /api/admin/contact-requests
 - Admin can block/activate users.
 - Blocked users cannot login, refresh token, create property, favorite, or send messages.
 - Admin can view contact requests.
+- Documentation must stay aligned with property lifecycle and chat-blocking rules.
 
 ---
 

@@ -190,7 +190,7 @@ export interface User {
 ```ts
 export type PropertyType = "apartment" | "house" | "land" | "villa" | "office";
 export type PropertyPurpose = "sale" | "rent";
-export type PropertyStatus = "pending" | "approved" | "rejected" | "hidden";
+export type PropertyStatus = "pending" | "approved" | "rejected" | "hidden" | "sold" | "rented";
 
 export interface Property {
   _id: string;
@@ -1218,11 +1218,11 @@ const propertySchema = new mongoose.Schema(
       ref: "User",
       required: true
     },
-    status: {
-      type: String,
-      enum: ["pending", "approved", "rejected", "hidden"],
-      default: "pending"
-    }
+      status: {
+        type: String,
+        enum: ["pending", "approved", "rejected", "hidden", "sold", "rented"],
+        default: "pending"
+      }
   },
   { timestamps: true }
 );
@@ -1972,17 +1972,19 @@ Service logic:
 
 ```text
 1. Check property exists and is approved.
-2. Get sellerId from property.ownerId.
-3. Prevent user from chatting with themselves if buyer is the seller.
-4. Check existing conversation between buyer, seller, and property.
-5. If exists, return existing conversation.
-6. Otherwise create conversation with participants = [buyerId, sellerId].
+2. Check property is not sold or rented.
+3. Get sellerId from property.ownerId.
+4. Prevent user from chatting with themselves if buyer is the seller.
+5. Check existing conversation between buyer, seller, and property.
+6. If exists, return existing conversation.
+7. Otherwise create conversation with participants = [buyerId, sellerId].
 ```
 
 Security note:
 
 ```text
 The client must not send sellerId. Backend derives sellerId from property.ownerId to prevent tampering.
+If the linked property is sold or rented, the API must return a conflict response and refuse to create a new conversation.
 ```
 
 ---
@@ -2003,6 +2005,7 @@ Business rules:
 
 ```text
 - Return only conversations where req.user._id is included in participants.
+- Constrain conversations to properties that are still open for chat when applicable.
 ```
 
 ---
@@ -2023,6 +2026,7 @@ Business rules:
 
 ```text
 - Only participants can view messages.
+- If the linked property has been sold or rented, the backend should block new message creation while still allowing history checks if the product later needs that behavior.
 ```
 
 ---
@@ -2618,10 +2622,11 @@ conversation:665fd909e6a9a12b10000001
 1. Client emits send_message with conversationId and content.
 2. Server validates socket.user.
 3. Server checks whether socket.user.userId is a participant of the conversation.
-4. Server validates message content.
-5. Server saves message to MongoDB.
-6. Server updates conversation.lastMessage.
-7. Server emits receive_message to conversation room.
+4. Server loads the linked property and checks whether it is sold or rented.
+5. Server validates message content.
+6. Server saves message to MongoDB.
+7. Server updates conversation.lastMessage.
+8. Server emits receive_message to conversation room.
 ```
 
 ---
@@ -3002,7 +3007,9 @@ Response:
 | Add duplicate favorite | Favorite | 409 Conflict |
 | Get approved properties | Property | Only approved properties returned |
 | Create conversation with propertyId | Chat | Seller derived from property.ownerId |
+| Create conversation with sold property | Chat | 409 Conflict |
 | Send chat message without socket token | Chat | Socket rejected |
+| Send chat message for sold property | Chat | Message blocked |
 | Approve property as admin | Admin | Status becomes approved |
 | Submit contact request | Contact | Request created |
 | Upload invalid file type | Upload | 400 Bad Request |

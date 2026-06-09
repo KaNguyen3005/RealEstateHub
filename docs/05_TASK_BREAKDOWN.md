@@ -194,6 +194,7 @@ Implement all main Mongoose schemas and seed data for demo.
 | T2-09 | Create seed sellers/users | Add sample seller and user accounts | DevOps | Medium | Database | To-do |
 | T2-10 | Create seed properties | Add approved and pending sample properties | DevOps | High | Database | To-do |
 | T2-11 | Test seed script | Run seed script and verify database records | QA | Medium | Testing | To-do |
+| T2-12 | Add sold/rented status | Update Property model for closed lifecycle states | Backend | High | Database | To-do |
 
 ## Important Rules
 
@@ -204,6 +205,7 @@ Implement all main Mongoose schemas and seed data for demo.
 - Property area must be greater than 0.
 - Property images must contain 1 to 10 URLs.
 - Favorite must be unique by userId + propertyId.
+- Property status must support sold and rented as closed states.
 ```
 
 ## Acceptance Criteria
@@ -443,6 +445,7 @@ Implement property listing, detail, seller management, compare, and favorite UI.
 | T7-14 | Create new property page | Submit property form to backend | Frontend | High | Frontend, Property | To-do |
 | T7-15 | Create edit property page | Load and update property | Frontend | Medium | Frontend, Property | To-do |
 | T7-16 | Test property frontend | Test listing/detail/create/edit/favorite/compare | QA | High | Testing | To-do |
+| T7-17 | Show sold/rented badges | Display closed-property labels and disable chat CTA | Frontend | High | Frontend, Property | To-do |
 
 ## Acceptance Criteria
 
@@ -452,6 +455,7 @@ Implement property listing, detail, seller management, compare, and favorite UI.
 - Users can open property detail.
 - Seller can create property.
 - Seller can edit/delete own properties.
+- Property cards and detail pages must clearly show sold/rented states and disable chat actions.
 - Compare page works with 2-3 properties.
 - Favorites work for authenticated users.
 ```
@@ -553,6 +557,7 @@ Implement secure realtime chat using Socket.io.
 | T10-12 | Create ChatWindow | Display messages and input | Frontend | High | Chat, Frontend | To-do |
 | T10-13 | Create MessageBubble | Own/right, other/left message UI | Frontend | Medium | Chat, Frontend | To-do |
 | T10-14 | Test realtime chat | Test two browsers/accounts | QA | High | Testing, Chat | To-do |
+| T10-15 | Block closed-property chat | Prevent conversation and message send for sold/rented property | Advanced | High | Chat | To-do |
 
 ## Security Rules
 
@@ -570,6 +575,7 @@ Implement secure realtime chat using Socket.io.
 ```text
 - User can start chat from property detail.
 - Conversation is linked to one property.
+- Chat creation is blocked when the property is sold or rented.
 - Message is saved to MongoDB.
 - Message appears realtime to the other participant.
 - Socket without token is rejected.
@@ -721,6 +727,7 @@ Prepare final report, slide, README, backup demo video, and defense script.
 | T14-08 | Prepare Postman collection | Export API test collection | Backend | Medium | Documentation | To-do |
 | T14-09 | Prepare defense Q&A | JWT, SSR/SSG/ISR, Socket, scaling, security | Leader | High | Documentation | To-do |
 | T14-10 | Final submission check | Verify all required files and links | Leader | High | Documentation | To-do |
+| T14-11 | Sync business rules docs | Update docs for sold/rented lifecycle and chat blocking | Documentation | High | Documentation | To-do |
 
 ## Required Deliverables
 

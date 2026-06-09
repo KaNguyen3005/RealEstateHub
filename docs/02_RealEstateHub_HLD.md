@@ -370,8 +370,10 @@ Main functions:
 - View property detail
 - Search and filter properties
 - Manage property status
+- Track open and closed lifecycle states for chat eligibility
 
 New property posts are created with `pending` status by default. Only approved properties are visible to public users.
+Properties can later move to `sold` or `rented`, which closes their chat flow and updates the UI badge accordingly.
 
 ---
 
@@ -406,6 +408,8 @@ The compare state may be stored in Zustand or local storage for better user expe
 ### 7.5 Contact Request Module
 
 The Contact Request Module allows users or guests to submit a request for consultation from a property detail page.
+
+This workflow is separate from realtime chat. It is intended for lead capture and follow-up, even when the property is not actively chat-available.
 
 This feature is implemented using **Next.js Server Action**.
 
@@ -443,6 +447,7 @@ Main functions:
 - Store message history
 - Load previous messages
 - Show typing indicator if possible
+- Block new conversations and message sending when the linked property is sold or rented
 
 Socket events:
 
@@ -641,7 +646,7 @@ GET /api/properties?city=HoChiMinh&type=apartment&purpose=rent&minPrice=5000000&
 | images | String[] | Cloudinary URLs |
 | amenities | String[] | Optional |
 | ownerId | ObjectId | Ref User |
-| status | Enum | pending / approved / rejected / hidden |
+| status | Enum | pending / approved / rejected / hidden / sold / rented |
 | createdAt | Date | Auto |
 | updatedAt | Date | Auto |
 
@@ -767,6 +772,7 @@ erDiagram
 ```
 
 Note: `Conversation` uses `participants: ObjectId[]`, so the relationship between `User` and `Conversation` is many-to-many.
+The `Conversation` document is still tied to exactly one property through `propertyId`, so the property lifecycle directly controls whether a conversation is allowed.
 
 ---
 
@@ -784,6 +790,13 @@ Note: `Conversation` uses `participants: ObjectId[]`, so the relationship betwee
 | Message | conversationId + createdAt | Load chat history efficiently |
 | ContactRequest | propertyId, createdAt | Manage contact requests by property |
 
+Closed property states:
+
+```text
+sold
+rented
+```
+
 ---
 
 ## 12. Business Rules Design
@@ -800,6 +813,9 @@ Note: `Conversation` uses `participants: ObjectId[]`, so the relationship betwee
 | BR-08 | Property images must be uploaded before or during property creation. |
 | BR-09 | Blocked users cannot create properties, favorite properties, or send messages. |
 | BR-10 | Contact requests can be submitted by both guests and authenticated users. |
+| BR-11 | Sold or rented properties are treated as closed and cannot start new conversations. |
+| BR-12 | Existing conversations for sold or rented properties must block new messages if the property is closed. |
+| BR-13 | Contact requests remain available as a separate workflow even when chat is closed. |
 
 ---
 
