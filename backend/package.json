@@ -5,7 +5,10 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "seed:admin": "node src/seed/seedAdmin.js",
+    "seed:demo": "node src/seed/seedDemoData.js",
+    "seed": "npm run seed:admin && npm run seed:demo"
   },
   "keywords": [
     "realestate",

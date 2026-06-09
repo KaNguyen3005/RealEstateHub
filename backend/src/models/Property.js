@@ -9,6 +9,13 @@ const propertySchema = new mongoose.Schema(
       trim: true,
       minlength: 5,
     },
+    // Slug duy nhất để hỗ trợ URL thân thiện và tránh trùng dữ liệu.
+    slug: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
     // Mô tả chi tiết về bất động sản.
     description: {
       type: String,
@@ -123,6 +130,7 @@ propertySchema.index({ status: 1, city: 1, purpose: 1, type: 1 });
 propertySchema.index({ price: 1 });
 propertySchema.index({ area: 1 });
 propertySchema.index({ ownerId: 1, status: 1, createdAt: -1 });
+propertySchema.index({ slug: 1 }, { unique: true, sparse: true });
 propertySchema.index({
   title: "text",
   description: "text",
