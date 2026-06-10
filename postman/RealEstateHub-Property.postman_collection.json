@@ -1,0 +1,755 @@
+{
+  "info": {
+    "_postman_id": "4e0b6d4b-0b37-4ad4-8f5e-4c7f0cf7b5f1",
+    "name": "RealEstateHub - Property APIs",
+    "description": "Property API collection for testing listing, detail, compare, create, update, delete, ownership checks, and admin status updates.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "Login Seller 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{seller1Email}}\",\n  \"password\": \"{{seller1Password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login the first demo seller and store seller1AccessToken."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "if (json?.data?.accessToken) {",
+                  "  pm.collectionVariables.set('seller1AccessToken', json.data.accessToken);",
+                  "}",
+                  "if (json?.data?.user?._id) {",
+                  "  pm.collectionVariables.set('seller1UserId', json.data.user._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Seller 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{seller2Email}}\",\n  \"password\": \"{{seller2Password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login the second demo seller and store seller2AccessToken."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "if (json?.data?.accessToken) {",
+                  "  pm.collectionVariables.set('seller2AccessToken', json.data.accessToken);",
+                  "}",
+                  "if (json?.data?.user?._id) {",
+                  "  pm.collectionVariables.set('seller2UserId', json.data.user._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login the seeded admin account and store adminAccessToken."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "if (json?.data?.accessToken) {",
+                  "  pm.collectionVariables.set('adminAccessToken', json.data.accessToken);",
+                  "}",
+                  "if (json?.data?.user?._id) {",
+                  "  pm.collectionVariables.set('adminUserId', json.data.user._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Public",
+      "item": [
+        {
+          "name": "Get Properties List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/properties?limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Fetch approved properties with pagination and seed comparison IDs from the result."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "const items = Array.isArray(json?.data?.items) ? json.data.items : [];",
+                  "pm.test('Items is an array', function () {",
+                  "  pm.expect(items).to.be.an('array');",
+                  "});",
+                  "",
+                  "const ids = items.map((item) => String(item?._id || '')).filter(Boolean);",
+                  "if (ids.length > 0) {",
+                  "  pm.collectionVariables.set('publicPropertyId', ids[0]);",
+                  "}",
+                  "if (ids.length > 0) {",
+                  "  pm.collectionVariables.set('compareIds', ids.slice(0, 3).join(','));",
+                  "}",
+                  "",
+                  "const seller1Email = pm.collectionVariables.get('seller1Email');",
+                  "const seller2Email = pm.collectionVariables.get('seller2Email');",
+                  "const seller1Item = items.find((item) => item?.ownerId?.email === seller1Email);",
+                  "const seller2Item = items.find((item) => item?.ownerId?.email === seller2Email);",
+                  "",
+                  "if (seller1Item?._id) {",
+                  "  pm.collectionVariables.set('sellerOnePropertyId', String(seller1Item._id));",
+                  "} else if (ids[0]) {",
+                  "  pm.collectionVariables.set('sellerOnePropertyId', ids[0]);",
+                  "}",
+                  "if (seller2Item?._id) {",
+                  "  pm.collectionVariables.set('sellerTwoPropertyId', String(seller2Item._id));",
+                  "} else if (ids[1]) {",
+                  "  pm.collectionVariables.set('sellerTwoPropertyId', ids[1]);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Property Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{sellerOnePropertyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{sellerOnePropertyId}}"
+              ]
+            },
+            "description": "Fetch the detail of an approved property."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('Property item exists', function () {",
+                  "  pm.expect(json?.data?.item).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Compare Properties",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/compare?ids={{compareIds}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "compare"
+              ],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "{{compareIds}}"
+                }
+              ]
+            },
+            "description": "Fetch up to three properties for comparison using property IDs."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "const items = Array.isArray(json?.data?.items) ? json.data.items : [];",
+                  "pm.test('Compare returns at most 3 items', function () {",
+                  "  pm.expect(items.length).to.be.at.most(3);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Seller",
+      "item": [
+        {
+          "name": "Create Property",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seller1AccessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{createPropertyTitle}}\",\n  \"description\": \"{{createPropertyDescription}}\",\n  \"type\": \"apartment\",\n  \"purpose\": \"sale\",\n  \"price\": 3500000000,\n  \"area\": 88,\n  \"bedrooms\": 2,\n  \"bathrooms\": 2,\n  \"address\": \"12 Demo Street, Ha Noi\",\n  \"city\": \"Ha Noi\",\n  \"district\": \"Cau Giay\",\n  \"ward\": \"Dich Vong\",\n  \"latitude\": 21.029,\n  \"longitude\": 105.782,\n  \"images\": [\n    \"https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=1200&q=80\"\n  ],\n  \"amenities\": [\n    \"Thang may\",\n    \"Bao ve 24/7\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/properties",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties"
+              ]
+            },
+            "description": "Create a new property as seller 1."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const timestamp = Date.now();",
+                  "pm.collectionVariables.set('createPropertyTitle', `P4-11 Demo Property ${timestamp}`);",
+                  "pm.collectionVariables.set('createPropertyDescription', `Demo property created for P4-11 at ${timestamp}. This description is long enough for validation.`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "if (json?.data?.item?._id) {",
+                  "  pm.collectionVariables.set('ownedPropertyId', json.data.item._id);",
+                  "}",
+                  "if (json?.data?.item?.title) {",
+                  "  pm.collectionVariables.set('ownedPropertyTitle', json.data.item.title);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Own Property",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seller1AccessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{updateOwnedPropertyTitle}}\",\n  \"price\": 3650000000,\n  \"area\": 90,\n  \"description\": \"Updated demo property description for P4-11. This text is long enough for validation.\",\n  \"images\": [\n    \"https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=1200&q=80\",\n    \"https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1200&q=80\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{ownedPropertyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{ownedPropertyId}}"
+              ]
+            },
+            "description": "Update the property created by seller 1."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('updateOwnedPropertyTitle', 'P4-11 Updated Demo Property');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('Property remains pending after seller edit', function () {",
+                  "  pm.expect(json?.data?.item?.status).to.eql('pending');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Own Property",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seller1AccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{ownedPropertyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{ownedPropertyId}}"
+              ]
+            },
+            "description": "Delete the property created by seller 1."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "if (json?.data?.item?._id) {",
+                  "  pm.test('Deleted property id matches', function () {",
+                  "    pm.expect(String(json.data.item._id)).to.eql(String(pm.collectionVariables.get('ownedPropertyId')));",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ownership Guard",
+      "item": [
+        {
+          "name": "Update Other Seller Property",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seller2AccessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Forbidden Update Attempt\",\n  \"price\": 3900000000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{sellerOnePropertyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{sellerOnePropertyId}}"
+              ]
+            },
+            "description": "Attempt to update seller 1 property using seller 2 token and expect 403."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Error message is Forbidden', function () {",
+                  "  pm.expect(json.message).to.eql('Forbidden');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Other Seller Property",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seller2AccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{sellerOnePropertyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{sellerOnePropertyId}}"
+              ]
+            },
+            "description": "Attempt to delete seller 1 property using seller 2 token and expect 403."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Error message is Forbidden', function () {",
+                  "  pm.expect(json.message).to.eql('Forbidden');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Update Property Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"hidden\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{sellerTwoPropertyId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{sellerTwoPropertyId}}",
+                "status"
+              ]
+            },
+            "description": "Update a property status as admin."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Success flag is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('Property status is hidden', function () {",
+                  "  pm.expect(json?.data?.item?.status).to.eql('hidden');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "seller1Email",
+      "value": "seller1@realestatehub.local"
+    },
+    {
+      "key": "seller1Password",
+      "value": "Seller@123"
+    },
+    {
+      "key": "seller2Email",
+      "value": "seller2@realestatehub.local"
+    },
+    {
+      "key": "seller2Password",
+      "value": "Seller@123"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@realestatehub.local"
+    },
+    {
+      "key": "adminPassword",
+      "value": "Admin@123"
+    },
+    {
+      "key": "seller1AccessToken",
+      "value": ""
+    },
+    {
+      "key": "seller2AccessToken",
+      "value": ""
+    },
+    {
+      "key": "adminAccessToken",
+      "value": ""
+    },
+    {
+      "key": "seller1UserId",
+      "value": ""
+    },
+    {
+      "key": "seller2UserId",
+      "value": ""
+    },
+    {
+      "key": "adminUserId",
+      "value": ""
+    },
+    {
+      "key": "publicPropertyId",
+      "value": ""
+    },
+    {
+      "key": "sellerOnePropertyId",
+      "value": ""
+    },
+    {
+      "key": "sellerTwoPropertyId",
+      "value": ""
+    },
+    {
+      "key": "ownedPropertyId",
+      "value": ""
+    },
+    {
+      "key": "ownedPropertyTitle",
+      "value": ""
+    },
+    {
+      "key": "createPropertyTitle",
+      "value": ""
+    },
+    {
+      "key": "createPropertyDescription",
+      "value": ""
+    },
+    {
+      "key": "updateOwnedPropertyTitle",
+      "value": ""
+    },
+    {
+      "key": "compareIds",
+      "value": ""
+    }
+  ]
+}
