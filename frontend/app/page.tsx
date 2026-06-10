@@ -1,6 +1,6 @@
 export default function HomePage() {
   return (
-    <main className="page-shell">
+    <section className="page-shell">
       <section className="hero">
         <p className="eyebrow">RealEstateHub</p>
         <h1>Frontend foundation is ready.</h1>
@@ -24,6 +24,6 @@ export default function HomePage() {
           </article>
         </div>
       </section>
-    </main>
+    </section>
   );
 }
