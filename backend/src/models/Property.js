@@ -130,7 +130,6 @@ propertySchema.index({ status: 1, city: 1, purpose: 1, type: 1 });
 propertySchema.index({ price: 1 });
 propertySchema.index({ area: 1 });
 propertySchema.index({ ownerId: 1, status: 1, createdAt: -1 });
-propertySchema.index({ slug: 1 }, { unique: true, sparse: true });
 propertySchema.index({
   title: "text",
   description: "text",
