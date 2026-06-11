@@ -645,6 +645,98 @@ Implement secure realtime chat using Socket.io.
 | P10-12 | Create ChatWindow UI | Frontend Lead | High | `feature/chat` |
 | P10-13 | Create ConversationList UI | Frontend Lead | Medium | `feature/chat` |
 
+### P10-01 Implementation Notes
+
+P10-01 is the foundation for the realtime chat feature. It should prepare the backend runtime to host Socket.io without introducing chat business logic yet; authentication, conversation handling, and message events belong to later P10 tasks.
+
+#### Scope
+
+- Add Socket.io support to the backend runtime.
+- Create `config/socket.js` as the central place for Socket.io initialization.
+- Switch the backend startup flow from `app.listen(...)` to an HTTP server that Socket.io can attach to.
+- Expose the Socket.io instance so later chat services can emit events from the backend.
+
+#### Required Behavior
+
+- Load environment variables before socket initialization.
+- Reuse the existing Express app and route registration.
+- Keep CORS credentials aligned with the current backend and client setup.
+- Preserve all existing REST endpoints while adding realtime capability.
+- Keep chat event wiring out of this task.
+
+#### Dependency / Environment Check
+
+- Add the Socket.io dependency if it is not already present in `backend/package.json`.
+- Confirm the backend still starts successfully after switching to the HTTP server pattern.
+- Confirm the server bootstrap remains compatible with the existing MongoDB connection flow.
+
+#### Integration Boundaries
+
+- Do not implement Socket.io authentication in P10-01.
+- Do not implement `join_conversation` or `send_message` in P10-01.
+- Do not add conversation or message persistence logic in P10-01.
+- Keep the task limited to runtime setup so later steps can build on a stable socket foundation.
+
+#### Business Validation Check
+
+- Confirm the backend can support the realtime chat module described in HLD and LLD.
+- Confirm the socket layer is initialized before any future conversation or message event handlers are attached.
+- Confirm the existing HTTP APIs remain functional after the runtime change.
+
+#### Done When
+
+- The backend runs through an HTTP server with Socket.io attached.
+- `config/socket.js` exists and is the central socket bootstrap point.
+- The backend remains able to serve current REST endpoints while being ready for P10-02 and later chat tasks.
+
+### P10-03 Implementation Notes
+
+P10-03 should establish the conversation data layer and the core conversation service logic used by the chat flow. The existing `Conversation` schema can be kept as the base, but this task must make the backend able to create and look up conversations according to the business rules in the LLD.
+
+#### Scope
+
+- Align the `Conversation` model with the chat data contract if any field or index refinement is needed.
+- Create a conversation service layer that encapsulates chat business rules.
+- Prepare reusable service methods for creating or retrieving a conversation for a property.
+- Keep the client out of seller selection and duplicate-conversation handling.
+
+#### Required Behavior
+
+- Accept only authenticated buyer requests for conversation creation.
+- Read `propertyId` from the request and derive `sellerId` from `property.ownerId`.
+- Verify the property exists and is approved before creating or reusing a conversation.
+- Reject conversation creation when the property is sold or rented.
+- Prevent a user from opening a conversation with themselves when they own the property.
+- Reuse an existing conversation if the same buyer, seller, and property already have one.
+- Otherwise create a new conversation with `participants = [buyerId, sellerId]`.
+
+#### Data / Model Rules
+
+- `propertyId` remains the anchor for the conversation.
+- `participants` must contain the buyer and seller user IDs.
+- `lastMessage` should stay available for list previews and default to an empty string.
+- Keep timestamps enabled so later APIs can sort by recent activity.
+- Preserve the existing conversation indexes, or refine them only if the service needs a stronger query path.
+
+#### Validation and Error Handling
+
+- Reject invalid `propertyId` values before hitting the database where possible.
+- Return clear errors when the property does not exist, is not approved, or is closed for chat.
+- Return a conflict-style error when the buyer is the seller or when a duplicate conversation already exists and the API layer expects a creation-only response.
+- Keep controller logic thin later by pushing the reusable rules into the service layer now.
+
+#### Business Validation Check
+
+- Confirm the service follows the LLD conversation flow: check property, derive seller, prevent self-chat, reuse existing conversation, otherwise create one.
+- Confirm the client does not send `sellerId`.
+- Confirm the conversation layer is ready for `GET /api/conversations`, `GET /api/conversations/:id/messages`, and socket room logic in later tasks.
+
+#### Done When
+
+- The backend has a reusable conversation service that can create or fetch a conversation correctly.
+- The model and service match the LLD conversation contract.
+- Later API and socket tasks can consume the conversation layer without duplicating business rules.
+
 ### APIs
 
 ```text
