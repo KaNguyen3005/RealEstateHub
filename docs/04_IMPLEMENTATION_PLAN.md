@@ -602,6 +602,118 @@ Implement contact request form using Next.js Server Action.
 | P9-07 | Use `BACKEND_API_URL` in Server Action | Frontend Lead | High | `feature/contact-request` |
 | P9-08 | Show success/error message | Frontend Lead | Medium | `feature/contact-request` |
 
+### P9-01 Implementation Notes
+
+P9-01 is not just "create a model"; it must establish the data contract for the whole contact-request workflow so later backend and frontend tasks can rely on it without rework.
+
+#### Scope
+
+- Create `models/ContactRequest.js`.
+- Define the schema for both guest and authenticated submissions.
+- Keep contact requests as a separate workflow from realtime chat/conversation.
+
+#### Required Schema Rules
+
+- `propertyId` is required and references `Property`.
+- `userId` is optional so guests can submit without authentication, while logged-in users can still be linked to their account.
+- `name`, `email`, `phone`, and `message` are required.
+- `message` should follow the LLD minimum length rule.
+- `status` must default to `"new"` and only allow `"new"`, `"contacted"`, and `"closed"`.
+- Enable timestamps so admins can sort and audit requests by creation time.
+
+#### Indexing / Query Support
+
+- Add an index on `{ propertyId: 1, createdAt: -1 }` to support property-level request history.
+- Add an index on `{ status: 1 }` to support admin filtering by workflow state.
+
+#### Business Validation Check
+
+- Confirm the model supports the SRS/HLD requirement that both guests and logged-in users can submit contact requests.
+- Confirm the model does not introduce any dependency on realtime chat entities.
+- Confirm the shape is compatible with the backend API response expected in the contact-request flow.
+
+#### Done When
+
+- The model can be imported cleanly by the route/service layer.
+- The schema matches the contact-request collection defined in LLD.
+- The default status and required fields are aligned with the contact-request business flow.
+
+### P9-02 Implementation Notes
+
+P9-02 should expose the create-contact-request backend flow end to end, using the `ContactRequest` model from P9-01 and enforcing the business rules defined in SRS/HLD/LLD.
+
+#### Scope
+
+- Create the backend route for `POST /api/contact-requests`.
+- Add a controller action for creating a contact request.
+- Add a service method that validates business conditions and persists the request.
+- Wire the route into the main backend router with the existing API response format.
+
+#### Required Behavior
+
+- Accept guest and logged-in submissions.
+- Read `propertyId`, `name`, `email`, `phone`, and `message` from the request body.
+- Attach `userId` only when an authenticated user exists.
+- Verify the target property exists before saving the request.
+- Verify the property is approved before allowing the request to be stored.
+- Save the request with `status: "new"` by default.
+- Return the created request identifier and status using the documented success response shape.
+
+#### Validation and Error Handling
+
+- Reject missing or invalid input before hitting the database where possible.
+- Return a clear error if the property does not exist.
+- Return a clear error if the property is not approved.
+- Keep controller logic thin and move business checks into the service layer.
+- Follow the repository's standard backend response and error middleware conventions.
+
+#### Business Validation Check
+
+- Confirm the route is accessible to both guests and authenticated users.
+- Confirm the created request does not depend on realtime chat flow.
+- Confirm the response matches the LLD contract for `POST /api/contact-requests`.
+
+#### Done When
+
+- `POST /api/contact-requests` creates a record successfully for both guests and logged-in users.
+- The stored record links `userId` only when auth is present.
+- The API returns the expected success payload and handles invalid property states cleanly.
+
+### P9-03 Implementation Notes
+
+P9-03 should ensure the contact request route can safely accept both guests and authenticated users by using `optionalAuth`, not `protect`, so the endpoint remains publicly usable while still attaching the current user when a valid token exists.
+
+#### Scope
+
+- Apply `optionalAuth` to the contact-request route.
+- Preserve guest access to `POST /api/contact-requests`.
+- Make authenticated user data available to the create request flow when a bearer token is present.
+
+#### Required Behavior
+
+- If no token is sent, the request still proceeds as a guest submission.
+- If a valid token is sent, `req.user` and auth context are populated for downstream handlers.
+- If the token is invalid or expired, the request should not be blocked as long as the payload itself is valid.
+- Do not require login for the contact request form submission.
+
+#### Validation and Error Handling
+
+- Keep invalid token handling non-blocking for this route.
+- Do not convert the route to `protect`, because that would break the guest submission requirement.
+- Ensure the middleware is attached before the controller so the service can optionally read `req.user`.
+
+#### Business Validation Check
+
+- Confirm the route still satisfies the SRS/HLD rule that guests and logged-in users can submit contact requests.
+- Confirm authenticated submissions still attach `userId` through the P9-02 service flow.
+- Confirm the route remains separate from realtime chat authentication rules.
+
+#### Done When
+
+- `POST /api/contact-requests` works for guests without a token.
+- `POST /api/contact-requests` also works for logged-in users and passes auth context forward.
+- Invalid or missing access tokens do not block the contact-request submission flow.
+
 ### API
 
 ```text

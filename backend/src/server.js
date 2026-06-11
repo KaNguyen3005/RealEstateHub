@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const healthRoutes = require("./routes/health.routes");
 const authRoutes = require("./routes/auth.routes");
 const propertyRoutes = require("./routes/property.routes");
+const contactRequestRoutes = require("./routes/contactRequest.routes");
 const errorMiddleware = require("./middlewares/error.middleware");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
+app.use("/api/contact-requests", contactRequestRoutes);
 app.use(errorMiddleware);
 
 async function startServer() {
