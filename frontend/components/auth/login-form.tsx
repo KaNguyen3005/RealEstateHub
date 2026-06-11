@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { LoadingButton } from "@/components/common/loading-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiClient, ApiClientError } from "@/lib/api";
+import { getRoleHomePath, getSafeNextPath } from "@/lib/auth-redirect";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import type { User } from "@/types/user";
@@ -24,9 +26,11 @@ const fieldBaseClass =
 
 interface LoginFormProps {
   initialNotice?: string | null;
+  nextPath?: string | null;
 }
 
-export function LoginForm({ initialNotice = null }: LoginFormProps) {
+export function LoginForm({ initialNotice = null, nextPath = null }: LoginFormProps) {
+  const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -69,6 +73,8 @@ export function LoginForm({ initialNotice = null }: LoginFormProps) {
         email: values.email,
         password: "",
       });
+
+      router.replace(getSafeNextPath(nextPath) || getRoleHomePath(response.data.user.role));
     } catch (error) {
       if (error instanceof ApiClientError) {
         setSubmitError(error.message || "Login failed");

@@ -53,10 +53,63 @@ export function Navbar({
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const storeIsAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const storeUser = useAuthStore((state) => state.user);
   const storeUserRole = useAuthStore((state) => state.user?.role ?? "user");
+  const authStatus = useAuthStore((state) => state.status);
 
-  const isAuthenticated = storeIsAuthenticated || isAuthenticatedProp;
+  const isResolvingAuth = authStatus === "bootstrapping";
+  const isAuthenticated = (authStatus === "authenticated" && storeIsAuthenticated) || isAuthenticatedProp;
   const effectiveUserRole = isAuthenticated ? storeUserRole : userRole;
+  const displayName = storeUser?.fullName || storeUser?.email || "Account";
+  const userInitials =
+    displayName
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "A";
+  const closeMobileMenu = () => setMobileOpen(false);
+
+  const resolvingDesktopActions = (
+    <div className="flex items-center gap-2" aria-label="Checking session">
+      <div className="h-10 w-20 animate-pulse rounded-md border border-border/70 bg-muted/50" />
+      <div className="h-10 w-24 animate-pulse rounded-md bg-muted/60" />
+    </div>
+  );
+
+  const guestDesktopActions = (
+    <>
+      <Button asChild variant="ghost">
+        <Link href="/login">Login</Link>
+      </Button>
+      <Button asChild>
+        <Link href="/register">Register</Link>
+      </Button>
+    </>
+  );
+
+  const resolvingMobileActions = (
+    <div className="flex gap-2" aria-label="Checking session">
+      <div className="h-10 flex-1 animate-pulse rounded-md border border-border/70 bg-muted/50" />
+      <div className="h-10 flex-1 animate-pulse rounded-md bg-muted/60" />
+    </div>
+  );
+
+  const guestMobileActions = (
+    <div className="flex gap-2">
+      <Button
+        asChild
+        variant="outline"
+        className="flex-1"
+        onClick={closeMobileMenu}
+      >
+        <Link href="/login">Login</Link>
+      </Button>
+      <Button asChild className="flex-1" onClick={closeMobileMenu}>
+        <Link href="/register">Register</Link>
+      </Button>
+    </div>
+  );
 
   const accountLinks = useMemo(() => {
     const links: AccountLink[] = [...authenticatedLinks];
@@ -72,7 +125,95 @@ export function Navbar({
     return links;
   }, [effectiveUserRole]);
 
-  const closeMobileMenu = () => setMobileOpen(false);
+  const desktopAuthActions = isResolvingAuth ? (
+    resolvingDesktopActions
+  ) : isAuthenticated ? (
+    <div className="flex items-center gap-2">
+      <details className="group relative">
+        <summary className="list-none">
+          <Button variant="outline" className="h-11 gap-3 rounded-lg border-border/80 bg-background/90 px-3 shadow-sm">
+            <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
+              {userInitials}
+            </span>
+            <span className="hidden max-w-36 truncate text-left text-sm font-medium lg:inline">
+              {displayName}
+            </span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+          </Button>
+        </summary>
+        <div className="absolute right-0 mt-3 w-64 rounded-lg border border-border/70 bg-background p-2 shadow-xl shadow-black/10">
+          <div className="flex items-center gap-3 rounded-md bg-muted/40 px-3 py-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
+              {userInitials}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground">{displayName}</p>
+              <p className="text-xs capitalize text-muted-foreground">{effectiveUserRole}</p>
+            </div>
+          </div>
+
+          <div className="mt-2 flex flex-col gap-1">
+            {accountLinks.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Button key={item.href} asChild variant="ghost" className="h-10 justify-start rounded-md px-3">
+                  <Link href={item.href}>
+                    <Icon className="h-4 w-4 text-muted-foreground" />
+                    {item.label}
+                  </Link>
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+      </details>
+
+      <LogoutButton className="h-11 rounded-lg px-3 text-destructive hover:text-destructive" />
+    </div>
+  ) : (
+    guestDesktopActions
+  );
+
+  const mobileAuthActions = isResolvingAuth ? (
+    resolvingMobileActions
+  ) : isAuthenticated ? (
+    <div className="flex flex-col gap-1">
+      <div className="mb-2 flex items-center gap-3 rounded-lg border border-border/70 bg-muted/30 px-4 py-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
+          {userInitials}
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">{displayName}</p>
+          <p className="text-xs capitalize text-muted-foreground">{effectiveUserRole}</p>
+        </div>
+      </div>
+      {accountLinks.map((item) => {
+        const Icon = item.icon;
+        return (
+          <Button
+            key={item.href}
+            asChild
+            variant="ghost"
+            className="justify-start px-4"
+            onClick={closeMobileMenu}
+          >
+            <Link href={item.href}>
+              <Icon className="h-4 w-4" />
+              {item.label}
+            </Link>
+          </Button>
+        );
+      })}
+      <div className="mt-2 border-t border-border/70 pt-2">
+        <LogoutButton
+          className="w-full justify-start px-4 text-destructive hover:text-destructive"
+          onLogoutStart={closeMobileMenu}
+        />
+      </div>
+    </div>
+  ) : (
+    guestMobileActions
+  );
 
   return (
     <header className={cn("sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl", className)}>
@@ -102,47 +243,7 @@ export function Navbar({
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          {!isAuthenticated ? (
-            <>
-              <Button asChild variant="ghost">
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/register">Register</Link>
-              </Button>
-            </>
-          ) : (
-            <details className="group relative">
-              <summary className="list-none">
-                <Button variant="outline">
-                  Account
-                  <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
-                </Button>
-              </summary>
-              <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-border/70 bg-background p-2 shadow-lg shadow-black/5">
-                <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Menu
-                </div>
-                <div className="flex flex-col gap-1">
-                  {accountLinks.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Button key={item.href} asChild variant="ghost" className="justify-start px-3">
-                        <Link href={item.href}>
-                          <Icon className="h-4 w-4" />
-                          {item.label}
-                        </Link>
-                      </Button>
-                    );
-                  })}
-                  <LogoutButton
-                    className="justify-start px-3 text-destructive hover:text-destructive"
-                    onLogoutStart={closeMobileMenu}
-                  />
-                </div>
-              </div>
-            </details>
-          )}
+          {desktopAuthActions}
         </div>
 
         <button
@@ -183,40 +284,7 @@ export function Navbar({
           </div>
 
           <div className="border-t border-border/70 pt-3">
-            {!isAuthenticated ? (
-              <div className="flex gap-2">
-                <Button asChild variant="outline" className="flex-1" onClick={closeMobileMenu}>
-                  <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild className="flex-1" onClick={closeMobileMenu}>
-                  <Link href="/register">Register</Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-1">
-                {accountLinks.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Button
-                      key={item.href}
-                      asChild
-                      variant="ghost"
-                      className="justify-start px-4"
-                      onClick={closeMobileMenu}
-                    >
-                      <Link href={item.href}>
-                        <Icon className="h-4 w-4" />
-                        {item.label}
-                      </Link>
-                    </Button>
-                  );
-                })}
-                <LogoutButton
-                  className="justify-start px-4 text-destructive hover:text-destructive"
-                  onLogoutStart={closeMobileMenu}
-                />
-              </div>
-            )}
+            {mobileAuthActions}
           </div>
         </div>
       </div>

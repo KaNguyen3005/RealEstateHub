@@ -2,42 +2,61 @@ import { create } from "zustand";
 
 import type { User } from "@/types/user";
 
+export type AuthStatus = "bootstrapping" | "authenticated" | "guest";
+
 interface AuthState {
   user: User | null;
   accessToken: string | null;
+  status: AuthStatus;
   isAuthenticated: boolean;
   isLoading: boolean;
+  hasBootstrapped: boolean;
   setAuth: (user: User, accessToken: string) => void;
-  setAccessToken: (accessToken: string) => void;
   clearAuth: () => void;
-  setLoading: (isLoading: boolean) => void;
+  beginBootstrap: () => void;
+  finishBootstrap: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
+  status: "bootstrapping",
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
+  hasBootstrapped: false,
   setAuth: (user, accessToken) =>
     set({
       user,
       accessToken,
+      status: "authenticated",
       isAuthenticated: true,
-      isLoading: false
+      isLoading: false,
+      hasBootstrapped: true
     }),
-  setAccessToken: (accessToken) =>
-    set((state) => ({
-      accessToken,
-      isAuthenticated: Boolean(accessToken)
-    })),
   clearAuth: () =>
     set({
       user: null,
       accessToken: null,
+      status: "guest",
       isAuthenticated: false,
-      isLoading: false
+      isLoading: false,
+      hasBootstrapped: true
     }),
-  setLoading: (isLoading) => set({ isLoading })
+  beginBootstrap: () =>
+    set({
+      status: "bootstrapping",
+      isLoading: true,
+      hasBootstrapped: false
+    }),
+  finishBootstrap: () => {
+    const currentStatus = get().status;
+
+    set({
+      status: currentStatus === "bootstrapping" ? "guest" : currentStatus,
+      isLoading: false,
+      hasBootstrapped: true
+    });
+  }
 }));
 
 export const authStore = useAuthStore;

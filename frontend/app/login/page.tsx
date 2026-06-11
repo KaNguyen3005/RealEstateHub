@@ -1,9 +1,11 @@
+import { AuthPageRedirect } from "@/components/auth/auth-page-redirect";
 import { LoginForm } from "@/components/auth/login-form";
 
 interface LoginPageProps {
   searchParams?: {
     registered?: string;
     loggedOut?: string;
+    next?: string;
   };
 }
 
@@ -15,5 +17,9 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
         ? "You have been signed out successfully."
         : null;
 
-  return <LoginForm initialNotice={initialNotice} />;
+  return (
+    <AuthPageRedirect nextPath={searchParams?.next ?? null}>
+      <LoginForm initialNotice={initialNotice} nextPath={searchParams?.next ?? null} />
+    </AuthPageRedirect>
+  );
 }

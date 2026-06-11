@@ -11,7 +11,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiClient, ApiClientError } from "@/lib/api";
+import { getRoleHomePath } from "@/lib/auth-redirect";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
+import type { User } from "@/types/user";
 import {
   registerSchema,
   type RegisterFormInput,
@@ -25,6 +28,7 @@ export function RegisterForm() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const {
     register,
@@ -49,7 +53,7 @@ export function RegisterForm() {
     setSubmitSuccess(null);
 
     try {
-      await apiClient.post("/api/auth/register", {
+      const response = await apiClient.post<{ user: User; accessToken: string }>("/api/auth/register", {
         fullName: values.fullName,
         email: values.email,
         phone: values.phone,
@@ -57,7 +61,12 @@ export function RegisterForm() {
         password: values.password,
       });
 
-      setSubmitSuccess("Registration successful. Redirecting to login...");
+      if (!response.data?.user || !response.data?.accessToken) {
+        throw new Error("Registration response is incomplete");
+      }
+
+      setAuth(response.data.user, response.data.accessToken);
+      setSubmitSuccess("Registration successful. Redirecting...");
       reset({
         fullName: "",
         email: "",
@@ -67,7 +76,7 @@ export function RegisterForm() {
         confirmPassword: "",
       });
 
-      router.push("/login?registered=1");
+      router.replace(getRoleHomePath(response.data.user.role));
     } catch (error) {
       if (error instanceof ApiClientError) {
         const message = error.message || "Registration failed";
