@@ -129,6 +129,17 @@ export function Navbar({
     resolvingDesktopActions
   ) : isAuthenticated ? (
     <div className="flex items-center gap-2">
+      <Button
+        asChild
+        variant={pathname === "/favorites" ? "secondary" : "ghost"}
+        className="h-11 rounded-lg px-3"
+      >
+        <Link href="/favorites">
+          <Heart className="h-4 w-4" />
+          Favorites
+        </Link>
+      </Button>
+
       <details className="group relative">
         <summary className="list-none">
           <Button variant="outline" className="h-11 gap-3 rounded-lg border-border/80 bg-background/90 px-3 shadow-sm">

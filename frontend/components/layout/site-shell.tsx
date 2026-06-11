@@ -4,6 +4,7 @@ import { AuthBootstrap } from "@/components/auth/auth-bootstrap";
 import { Footer } from "@/components/common/footer";
 import { Navbar } from "@/components/common/navbar";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
+import { FavoriteBootstrap } from "@/components/property/favorite-bootstrap";
 import { cn } from "@/lib/utils";
 
 interface SiteShellProps {
@@ -20,6 +21,7 @@ export function SiteShell({ children, className }: SiteShellProps) {
       )}
     >
       <AuthBootstrap />
+      <FavoriteBootstrap />
       <NavigationProgress />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.7),_transparent_60%)]" />
       <div className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-[22rem] bg-[linear-gradient(180deg,_rgba(255,255,255,0.18),_transparent)]" />
