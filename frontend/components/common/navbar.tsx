@@ -2,11 +2,23 @@
 
 import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { Menu, ChevronDown, Heart, LayoutDashboard, LogOut, MessageSquare, Search, Shield, User, X } from "lucide-react";
+import {
+  ChevronDown,
+  Heart,
+  LayoutDashboard,
+  MessageSquare,
+  Menu,
+  Search,
+  Shield,
+  User,
+  X
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { LogoutButton } from "@/components/auth/logout-button";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 
 type UserRole = "user" | "seller" | "admin";
@@ -34,26 +46,31 @@ const authenticatedLinks: AccountLink[] = [
 ];
 
 export function Navbar({
-  isAuthenticated = false,
+  isAuthenticated: isAuthenticatedProp = false,
   userRole = "user",
   className
 }: NavbarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const storeIsAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const storeUserRole = useAuthStore((state) => state.user?.role ?? "user");
+
+  const isAuthenticated = storeIsAuthenticated || isAuthenticatedProp;
+  const effectiveUserRole = isAuthenticated ? storeUserRole : userRole;
 
   const accountLinks = useMemo(() => {
     const links: AccountLink[] = [...authenticatedLinks];
 
-    if (userRole === "seller") {
+    if (effectiveUserRole === "seller") {
       links.push({ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard });
     }
 
-    if (userRole === "admin") {
+    if (effectiveUserRole === "admin") {
       links.push({ href: "/admin", label: "Admin", icon: Shield });
     }
 
     return links;
-  }, [userRole]);
+  }, [effectiveUserRole]);
 
   const closeMobileMenu = () => setMobileOpen(false);
 
@@ -118,10 +135,10 @@ export function Navbar({
                       </Button>
                     );
                   })}
-                  <Button variant="ghost" className="justify-start px-3 text-destructive hover:text-destructive">
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </Button>
+                  <LogoutButton
+                    className="justify-start px-3 text-destructive hover:text-destructive"
+                    onLogoutStart={closeMobileMenu}
+                  />
                 </div>
               </div>
             </details>
@@ -194,10 +211,10 @@ export function Navbar({
                     </Button>
                   );
                 })}
-                <Button variant="ghost" className="justify-start px-4 text-destructive hover:text-destructive">
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
+                <LogoutButton
+                  className="justify-start px-4 text-destructive hover:text-destructive"
+                  onLogoutStart={closeMobileMenu}
+                />
               </div>
             )}
           </div>

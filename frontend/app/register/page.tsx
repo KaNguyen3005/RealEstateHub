@@ -1,10 +1,5 @@
-import { RoutePlaceholder } from "@/components/common/route-placeholder";
+import { RegisterForm } from "@/components/auth/register-form";
 
 export default function RegisterPage() {
-  return (
-    <RoutePlaceholder
-      title="Register"
-      description="Register route created for Phase 5. Registration form will be implemented later."
-    />
-  );
+  return <RegisterForm />;
 }

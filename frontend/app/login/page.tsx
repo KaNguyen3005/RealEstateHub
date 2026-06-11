@@ -1,10 +1,19 @@
-import { RoutePlaceholder } from "@/components/common/route-placeholder";
+import { LoginForm } from "@/components/auth/login-form";
 
-export default function LoginPage() {
-  return (
-    <RoutePlaceholder
-      title="Login"
-      description="Login route created for Phase 5. Authentication form will be implemented later."
-    />
-  );
+interface LoginPageProps {
+  searchParams?: {
+    registered?: string;
+    loggedOut?: string;
+  };
+}
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  const initialNotice =
+    searchParams?.registered === "1"
+      ? "Registration successful. Please sign in with your new account."
+      : searchParams?.loggedOut === "1"
+        ? "You have been signed out successfully."
+        : null;
+
+  return <LoginForm initialNotice={initialNotice} />;
 }

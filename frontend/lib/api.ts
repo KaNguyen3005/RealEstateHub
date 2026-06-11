@@ -80,6 +80,7 @@ export async function apiRequest<TResponse>(
     ...options,
     body,
     headers,
+    credentials: options.credentials ?? "include",
     cache: options.cache ?? "no-store"
   });
 
