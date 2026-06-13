@@ -416,15 +416,15 @@ async function createProperty(userId, payload) {
   }
 
   const normalizedPayload = normalizePropertyPayload(payload, { requireAllFields: true });
+  const propertyId = new mongoose.Types.ObjectId();
 
   const property = await Property.create({
+    _id: propertyId,
     ...normalizedPayload,
     ownerId: userId,
+    slug: buildSlug(normalizedPayload.title, String(propertyId).slice(-6)),
     status: "pending",
   });
-
-  property.slug = buildSlug(property.title, String(property._id).slice(-6));
-  await property.save();
 
   return await property.populate("ownerId", "fullName email role avatar");
 }

@@ -24,22 +24,24 @@ export function PropertyCard({ property }: PropertyCardProps) {
   return (
     <article className="overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-sm shadow-black/5 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/10">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        <img
-          src={coverImage}
-          alt={property.title}
-          className="h-full w-full object-cover transition duration-500 hover:scale-105"
-        />
+        <Link href={`/properties/${property._id}`} aria-label={`View details for ${property.title}`} className="group block h-full">
+          <img
+            src={coverImage}
+            alt={property.title}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+          {isClosedProperty(property) ? (
+            <div className="absolute inset-0 grid place-items-center bg-black/35 text-sm font-semibold uppercase tracking-[0.2em] text-white">
+              {property.status}
+            </div>
+          ) : null}
+        </Link>
         <div className="absolute left-3 top-3 flex gap-2">
           <PropertyStatusBadge status={property.status} />
           <span className="rounded-md bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
             {formatPropertyPurpose(property.purpose)}
           </span>
         </div>
-        {isClosedProperty(property) ? (
-          <div className="absolute inset-0 grid place-items-center bg-black/35 text-sm font-semibold uppercase tracking-[0.2em] text-white">
-            {property.status}
-          </div>
-        ) : null}
       </div>
 
       <div className="space-y-4 p-4">

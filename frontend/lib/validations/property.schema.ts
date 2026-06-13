@@ -1,22 +1,5 @@
 import { z } from "zod";
 
-const imageUrlsSchema = z.preprocess(
-  (value) => {
-    if (typeof value !== "string") {
-      return value;
-    }
-
-    return value
-      .split("\n")
-      .map((item) => item.trim())
-      .filter(Boolean);
-  },
-  z
-    .array(z.string().url("Each image must be a valid URL"))
-    .min(1, "Add at least 1 image URL")
-    .max(10, "Images must not exceed 10 URLs")
-);
-
 const amenitiesSchema = z.preprocess((value) => {
   if (typeof value !== "string") {
     return value;
@@ -47,7 +30,10 @@ export const propertySchema = z.object({
   ward: z.string().trim().optional(),
   latitude: z.coerce.number(),
   longitude: z.coerce.number(),
-  images: imageUrlsSchema,
+  images: z
+    .array(z.string().url("Each image must be uploaded successfully"))
+    .min(1, "Upload at least 1 image")
+    .max(10, "Images must not exceed 10 files"),
   amenities: amenitiesSchema,
 });
 

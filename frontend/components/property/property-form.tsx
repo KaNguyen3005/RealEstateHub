@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 
 import { LoadingButton } from "@/components/common/loading-button";
+import { ImageUploadBox } from "@/components/property/image-upload-box";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +32,8 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<PropertyFormInput, unknown, PropertyFormValues>({
     resolver: zodResolver(propertySchema),
@@ -48,10 +52,11 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
       ward: initialProperty?.ward ?? "",
       latitude: initialProperty?.latitude ?? 10.7769,
       longitude: initialProperty?.longitude ?? 106.7009,
-      images: (initialProperty?.images ?? []).join("\n"),
+      images: initialProperty?.images ?? [],
       amenities: (initialProperty?.amenities ?? []).join(", "),
     },
   });
+  const imageUrls = watch("images") ?? [];
 
   const handleValidSubmit = handleSubmit(async (values) => {
     setSubmitError(null);
@@ -97,6 +102,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
             <option value="villa">Villa</option>
             <option value="office">Office</option>
           </select>
+          {errors.type ? <p className="mt-2 text-sm text-destructive">{errors.type.message}</p> : null}
         </div>
 
         <div>
@@ -105,6 +111,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
             <option value="sale">Sale</option>
             <option value="rent">Rent</option>
           </select>
+          {errors.purpose ? <p className="mt-2 text-sm text-destructive">{errors.purpose.message}</p> : null}
         </div>
 
         <div>
@@ -122,11 +129,13 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
         <div>
           <Label htmlFor="bedrooms">Bedrooms</Label>
           <Input id="bedrooms" type="number" min="0" className={fieldClassName} {...register("bedrooms")} />
+          {errors.bedrooms ? <p className="mt-2 text-sm text-destructive">{errors.bedrooms.message}</p> : null}
         </div>
 
         <div>
           <Label htmlFor="bathrooms">Bathrooms</Label>
           <Input id="bathrooms" type="number" min="0" className={fieldClassName} {...register("bathrooms")} />
+          {errors.bathrooms ? <p className="mt-2 text-sm text-destructive">{errors.bathrooms.message}</p> : null}
         </div>
 
         <div className="md:col-span-2">
@@ -154,31 +163,27 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
         <div>
           <Label htmlFor="latitude">Latitude</Label>
           <Input id="latitude" type="number" step="any" className={fieldClassName} {...register("latitude")} />
+          {errors.latitude ? <p className="mt-2 text-sm text-destructive">{errors.latitude.message}</p> : null}
         </div>
 
         <div>
           <Label htmlFor="longitude">Longitude</Label>
           <Input id="longitude" type="number" step="any" className={fieldClassName} {...register("longitude")} />
+          {errors.longitude ? <p className="mt-2 text-sm text-destructive">{errors.longitude.message}</p> : null}
         </div>
 
         <div className="md:col-span-2">
-          <Label htmlFor="images">Image URLs</Label>
-          <textarea
-            id="images"
-            rows={5}
-            placeholder="One image URL per line"
-            className={cn(
-              "mt-2 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none",
-              errors.images && "border-destructive"
-            )}
-            {...register("images")}
+          <ImageUploadBox
+            value={imageUrls}
+            onChange={(urls) => setValue("images", urls, { shouldDirty: true, shouldValidate: true })}
+            errorMessage={errors.images?.message}
           />
-          {errors.images ? <p className="mt-2 text-sm text-destructive">{errors.images.message}</p> : null}
         </div>
 
         <div className="md:col-span-2">
           <Label htmlFor="amenities">Amenities</Label>
           <Input id="amenities" placeholder="Parking, Balcony, Security" className={fieldClassName} {...register("amenities")} />
+          <p className="mt-2 text-xs text-muted-foreground">Optional. Separate multiple items with commas.</p>
         </div>
       </div>
 
@@ -190,7 +195,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
           {submitLabel}
         </LoadingButton>
         <Button asChild type="button" variant="ghost">
-          <a href="/dashboard/properties">Cancel</a>
+          <Link href="/dashboard/properties">Cancel</Link>
         </Button>
       </div>
     </form>

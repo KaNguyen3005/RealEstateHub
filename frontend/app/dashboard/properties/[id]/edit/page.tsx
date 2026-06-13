@@ -20,6 +20,7 @@ interface EditPropertyPageProps {
 export default function EditPropertyPage({ params }: EditPropertyPageProps) {
   const router = useRouter();
   const accessToken = useAuthStore((state) => state.accessToken);
+  const authStatus = useAuthStore((state) => state.status);
   const [property, setProperty] = useState<Property | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -28,7 +29,16 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
     let isMounted = true;
 
     const loadProperty = async () => {
+      if (authStatus === "bootstrapping") {
+        return;
+      }
+
       if (!accessToken) {
+        if (isMounted) {
+          setProperty(null);
+          setErrorMessage("Please login again before editing this property.");
+          setIsLoading(false);
+        }
         return;
       }
 
@@ -56,7 +66,7 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
     return () => {
       isMounted = false;
     };
-  }, [accessToken, params.id]);
+  }, [accessToken, authStatus, params.id]);
 
   const handleSubmit = async (values: PropertyFormValues) => {
     if (!accessToken) {
