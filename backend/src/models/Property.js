@@ -117,7 +117,7 @@ const propertySchema = new mongoose.Schema(
     // Trạng thái duyệt tin của hệ thống.
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected", "hidden"],
+      enum: ["pending", "approved", "rejected", "hidden", "sold", "rented"],
       default: "pending",
     },
   },

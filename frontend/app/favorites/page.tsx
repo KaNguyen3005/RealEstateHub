@@ -1,13 +1,93 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import { ProtectedRoute } from "@/components/auth/protected-route";
-import { RoutePlaceholder } from "@/components/common/route-placeholder";
+import { EmptyState } from "@/components/common/empty-state";
+import { LoadingSpinner } from "@/components/common/loading-spinner";
+import { PropertyCard } from "@/components/property/property-card";
+import { getFavorites } from "@/lib/favorites";
+import { useAuthStore } from "@/store/authStore";
+import { useFavoriteStore } from "@/store/favoriteStore";
+import type { Property } from "@/types/property";
 
 export default function FavoritesPage() {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const authStatus = useAuthStore((state) => state.status);
+  const setFavorites = useFavoriteStore((state) => state.setFavorites);
+  const [items, setItems] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadFavorites = async () => {
+      if (authStatus === "bootstrapping") {
+        return;
+      }
+
+      if (!accessToken) {
+        setItems([]);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      try {
+        const data = await getFavorites(accessToken);
+
+        if (isMounted) {
+          setItems(data.items);
+          setFavorites(data.favoriteIds);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(error instanceof Error ? error.message : "Failed to load favorites.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadFavorites();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [accessToken, authStatus, setFavorites]);
+
   return (
     <ProtectedRoute>
-      <RoutePlaceholder
-        title="Favorites"
-        description="Favorites route created for Phase 5. Favorite property list will be implemented later."
-      />
+      <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mb-8 space-y-3">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Favorites</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Saved properties</h1>
+          <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+            Properties saved to your account.
+          </p>
+        </div>
+
+        {isLoading ? (
+          <div className="flex min-h-[40vh] items-center justify-center">
+            <LoadingSpinner label="Loading favorites..." />
+          </div>
+        ) : errorMessage ? (
+          <EmptyState title="Favorites could not load" description={errorMessage} actionLabel="Browse properties" actionHref="/properties" />
+        ) : items.length === 0 ? (
+          <EmptyState title="No saved properties" description="Save properties from the listing page to see them here." actionLabel="Browse properties" actionHref="/properties" />
+        ) : (
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {items.map((property) => (
+              <PropertyCard key={property._id} property={property} />
+            ))}
+          </div>
+        )}
+      </section>
     </ProtectedRoute>
   );
 }
