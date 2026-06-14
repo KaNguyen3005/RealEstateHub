@@ -29,7 +29,7 @@ export function LogoutButton({ className, onLogoutStart }: LogoutButtonProps) {
     try {
       await apiClient.post("/api/auth/logout");
     } catch {
-      // Keep logging out locally even if the server request fails.
+      // Vẫn tiếp tục đăng xuất ở local (client) ngay cả khi request lên server thất bại.
     } finally {
       clearAuth();
       setIsLoggingOut(false);
@@ -46,7 +46,7 @@ export function LogoutButton({ className, onLogoutStart }: LogoutButtonProps) {
       className={className}
     >
       <LogOut className="h-4 w-4" />
-      Logout
+      Đăng xuất
     </LoadingButton>
   );
 }
