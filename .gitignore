@@ -20,6 +20,8 @@ build/
 out/
 .next/
 coverage/
+test-results/
+playwright-report/
 
 # Cache and temp files
 .cache/

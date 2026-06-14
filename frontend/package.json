@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "e2e": "node tests/e2e/run-e2e.js",
+    "e2e:ui": "node tests/e2e/run-e2e.js --ui"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -30,6 +32,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@tailwindcss/postcss": "^4.3.0",

@@ -9,6 +9,23 @@ npm install
 npm run dev
 ```
 
+## Test
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+Run E2E smoke tests with a local mocked backend:
+
+```bash
+npx playwright install chromium
+npm run e2e
+```
+
+The E2E command starts a mock API and the Next.js dev server automatically.
+
 ## Environment
 
 Copy `frontend/.env.example` to your local `.env.local` file and fill in the backend URLs.
