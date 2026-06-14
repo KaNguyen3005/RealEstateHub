@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
     "seed:admin": "node src/seed/seedAdmin.js",
     "seed:demo": "node src/seed/seedDemoData.js",
     "seed": "npm run seed:admin && npm run seed:demo",
@@ -31,5 +33,10 @@
     "mongoose": "^8.16.1",
     "socket.io": "^4.8.3",
     "multer": "^2.1.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
+    "supertest": "^7.0.0"
   }
 }
