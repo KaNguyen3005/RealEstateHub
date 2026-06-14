@@ -13,10 +13,9 @@ const healthRoutes = require("./routes/health.routes");
 const authRoutes = require("./routes/auth.routes");
 const propertyRoutes = require("./routes/property.routes");
 const contactRequestRoutes = require("./routes/contactRequest.routes");
-const favoriteRoutes = require("./routes/favorite.routes")
-const uploadRoutes = require("./routes/upload.routes")
+const favoriteRoutes = require("./routes/favorite.routes");
+const uploadRoutes = require("./routes/upload.routes");
 const conversationRoutes = require("./routes/conversation.routes");
-const contactRequestRoutes = require("./routes/contactRequest.routes");
 const errorMiddleware = require("./middlewares/error.middleware");
 
 const app = express();
@@ -43,6 +42,10 @@ app.get("/", (req, res) => {
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
+app.use("/api/uploads", uploadRoutes);
+app.use("/api/favorites", favoriteRoutes);
+app.use("/api/contact-requests", contactRequestRoutes);
+app.use("/api/conversations", conversationRoutes);
 app.use(errorMiddleware);
 
 async function startServer() {

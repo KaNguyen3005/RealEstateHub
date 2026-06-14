@@ -3,30 +3,20 @@ const ContactRequest = require("../models/ContactRequest");
 const Property = require("../models/Property");
 const { createHttpError } = require("../utils/httpError");
 
+function trimString(value) {
+  return String(value ?? "").trim();
+}
+
 function isValidObjectId(value) {
   return mongoose.Types.ObjectId.isValid(String(value || ""));
 }
 
-function normalizeStringField(value, fieldName, { minLength = 1, maxLength } = {}) {
-  const normalized = String(value || "").trim();
-
-  if (!normalized) {
-    throw createHttpError(400, `${fieldName} is required`);
-  }
-
-  if (normalized.length < minLength) {
-    throw createHttpError(400, `${fieldName} must be at least ${minLength} characters`);
-  }
-
-  if (typeof maxLength === "number" && normalized.length > maxLength) {
-    throw createHttpError(400, `${fieldName} must not exceed ${maxLength} characters`);
-  }
-
-  return normalized;
-}
-
 function normalizeContactRequestPayload(payload = {}) {
-  const propertyId = String(payload.propertyId || "").trim();
+  const propertyId = trimString(payload.propertyId);
+  const name = trimString(payload.name);
+  const email = trimString(payload.email).toLowerCase();
+  const phone = trimString(payload.phone);
+  const message = trimString(payload.message);
 
   if (!propertyId) {
     throw createHttpError(400, "propertyId is required");
@@ -36,21 +26,40 @@ function normalizeContactRequestPayload(payload = {}) {
     throw createHttpError(400, "Invalid propertyId");
   }
 
-  const email = normalizeStringField(payload.email, "email", {
-    minLength: 5,
-    maxLength: 160,
-  }).toLowerCase();
+  if (!name) {
+    throw createHttpError(400, "name is required");
+  }
+
+  if (name.length < 2) {
+    throw createHttpError(400, "name must be at least 2 characters long");
+  }
+
+  if (!email) {
+    throw createHttpError(400, "email is required");
+  }
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw createHttpError(400, "email is invalid");
   }
 
+  if (!phone) {
+    throw createHttpError(400, "phone is required");
+  }
+
+  if (!message) {
+    throw createHttpError(400, "message is required");
+  }
+
+  if (message.length < 10) {
+    throw createHttpError(400, "message must be at least 10 characters long");
+  }
+
   return {
     propertyId,
-    name: normalizeStringField(payload.name, "name", { minLength: 2, maxLength: 120 }),
+    name,
     email,
-    phone: normalizeStringField(payload.phone, "phone", { minLength: 8, maxLength: 30 }),
-    message: normalizeStringField(payload.message, "message", { minLength: 10, maxLength: 2000 }),
+    phone,
+    message,
   };
 }
 
@@ -84,25 +93,6 @@ async function createContactRequest(payload, currentUser) {
   return contactRequest;
 }
 
-async function getMyContactRequests(userIdInput) {
-  const userId = String(userIdInput || "").trim();
-
-  if (!userId || !isValidObjectId(userId)) {
-    throw createHttpError(401, "Authentication is required");
-  }
-
-  const requests = await ContactRequest.find({ userId })
-    .sort({ createdAt: -1 })
-    .populate({
-      path: "propertyId",
-      select: "title price status images city district ward",
-    });
-
-  return requests;
-}
-
 module.exports = {
   createContactRequest,
-  getMyContactRequests,
-  normalizeContactRequestPayload,
 };

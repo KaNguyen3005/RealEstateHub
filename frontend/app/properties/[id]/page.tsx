@@ -8,6 +8,7 @@ import { FavoriteButton } from "@/components/property/favorite-button";
 import { PropertyGallery } from "@/components/property/property-gallery";
 import { PropertyMap } from "@/components/property/property-map";
 import { PropertyStatusBadge } from "@/components/property/property-status-badge";
+import { StartChatButton } from "@/components/property/start-chat-button";
 import { Button } from "@/components/ui/button";
 import {
   formatAddress,
@@ -102,6 +103,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
             <Button asChild disabled={isClosed}>
               <a href="#contact-request">{isClosed ? "Unavailable" : "Contact seller"}</a>
             </Button>
+            <StartChatButton propertyId={property._id} disabled={isClosed} />
           </div>
         </aside>
       </div>
