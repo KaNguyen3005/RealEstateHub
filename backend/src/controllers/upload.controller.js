@@ -4,7 +4,7 @@ const { successResponse } = require("../utils/apiResponse");
 async function uploadPropertyImages(req, res) {
   const data = await uploadService.uploadPropertyImages(req.files);
 
-  return res.status(200).json(
+  return res.status(201).json(
     successResponse("Images uploaded successfully", data)
   );
 }

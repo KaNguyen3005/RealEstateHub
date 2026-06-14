@@ -1,9 +1,5 @@
 import { apiClient } from "@/lib/api";
 
-interface UploadPropertyImagesResult {
-  urls: string[];
-}
-
 export async function uploadPropertyImages(files: File[], token: string) {
   const formData = new FormData();
 
@@ -11,7 +7,7 @@ export async function uploadPropertyImages(files: File[], token: string) {
     formData.append("images", file);
   });
 
-  const response = await apiClient.post<UploadPropertyImagesResult>("/api/uploads/properties", formData, {
+  const response = await apiClient.post<{ urls: string[] }>("/api/uploads/properties", formData, {
     token,
   });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   ChevronDown,
@@ -41,6 +41,11 @@ const publicLinks = [
 
 const authenticatedLinks: AccountLink[] = [
   { href: "/profile", label: "Profile", icon: User },
+  { href: "/chat", label: "Chat", icon: MessageSquare }
+];
+
+const mobileAuthenticatedLinks: AccountLink[] = [
+  { href: "/profile", label: "Profile", icon: User },
   { href: "/favorites", label: "Favorites", icon: Heart },
   { href: "/chat", label: "Chat", icon: MessageSquare }
 ];
@@ -52,6 +57,8 @@ export function Navbar({
 }: NavbarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const storeIsAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const storeUser = useAuthStore((state) => state.user);
   const storeUserRole = useAuthStore((state) => state.user?.role ?? "user");
@@ -112,7 +119,11 @@ export function Navbar({
   );
 
   const accountLinks = useMemo(() => {
-    const links: AccountLink[] = [...authenticatedLinks];
+    return authenticatedLinks;
+  }, []);
+
+  const mobileAccountLinks = useMemo(() => {
+    const links: AccountLink[] = [...mobileAuthenticatedLinks];
 
     if (effectiveUserRole === "seller") {
       links.push({ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard });
@@ -124,14 +135,71 @@ export function Navbar({
 
     return links;
   }, [effectiveUserRole]);
+  const managementLink = useMemo<AccountLink | null>(() => {
+    if (effectiveUserRole === "seller") {
+      return { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard };
+    }
+
+    if (effectiveUserRole === "admin") {
+      return { href: "/admin", label: "Admin", icon: Shield };
+    }
+
+    return null;
+  }, [effectiveUserRole]);
+  const isActivePath = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const ManagementIcon = managementLink?.icon;
+
+  useEffect(() => {
+    setAccountOpen(false);
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!accountOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!accountMenuRef.current?.contains(event.target as Node)) {
+        setAccountOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setAccountOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [accountOpen]);
 
   const desktopAuthActions = isResolvingAuth ? (
     resolvingDesktopActions
   ) : isAuthenticated ? (
     <div className="flex items-center gap-2">
+      {managementLink ? (
+        <Button
+          asChild
+          variant={isActivePath(managementLink.href) ? "secondary" : "ghost"}
+          className="h-11 rounded-lg px-3"
+        >
+          <Link href={managementLink.href}>
+            {ManagementIcon ? <ManagementIcon className="h-4 w-4" /> : null}
+            {managementLink.label}
+          </Link>
+        </Button>
+      ) : null}
+
       <Button
         asChild
-        variant={pathname === "/favorites" ? "secondary" : "ghost"}
+        variant={isActivePath("/favorites") ? "secondary" : "ghost"}
         className="h-11 rounded-lg px-3"
       >
         <Link href="/favorites">
@@ -140,46 +208,60 @@ export function Navbar({
         </Link>
       </Button>
 
-      <details className="group relative">
-        <summary className="list-none">
-          <Button variant="outline" className="h-11 gap-3 rounded-lg border-border/80 bg-background/90 px-3 shadow-sm">
+      <div ref={accountMenuRef} className="relative">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11 gap-3 rounded-lg border-border/80 bg-background/90 px-3 shadow-sm"
+          aria-expanded={accountOpen}
+          aria-haspopup="menu"
+          onClick={() => setAccountOpen((isOpen) => !isOpen)}
+        >
             <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
               {userInitials}
             </span>
             <span className="hidden max-w-36 truncate text-left text-sm font-medium lg:inline">
               {displayName}
             </span>
-            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+            <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", accountOpen && "rotate-180")} />
           </Button>
-        </summary>
-        <div className="absolute right-0 mt-3 w-64 rounded-lg border border-border/70 bg-background p-2 shadow-xl shadow-black/10">
-          <div className="flex items-center gap-3 rounded-md bg-muted/40 px-3 py-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
-              {userInitials}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-foreground">{displayName}</p>
-              <p className="text-xs capitalize text-muted-foreground">{effectiveUserRole}</p>
+
+        {accountOpen ? (
+          <div
+            role="menu"
+            className="absolute right-0 z-50 mt-3 w-64 rounded-lg border border-border/70 bg-background p-2 shadow-xl shadow-black/10"
+          >
+            <div className="flex items-center gap-3 rounded-md bg-muted/40 px-3 py-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
+                {userInitials}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-foreground">{displayName}</p>
+                <p className="text-xs capitalize text-muted-foreground">{effectiveUserRole}</p>
+              </div>
+            </div>
+
+            <div className="mt-2 flex flex-col gap-1">
+              {accountLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button key={item.href} asChild variant="ghost" className="h-10 justify-start rounded-md px-3">
+                    <Link href={item.href} role="menuitem" onClick={() => setAccountOpen(false)}>
+                      <Icon className="h-4 w-4 text-muted-foreground" />
+                      {item.label}
+                    </Link>
+                  </Button>
+                );
+              })}
+              <div className="my-1 border-t border-border/70" />
+              <LogoutButton
+                className="h-10 justify-start rounded-md px-3 text-destructive hover:text-destructive"
+                onLogoutStart={() => setAccountOpen(false)}
+              />
             </div>
           </div>
-
-          <div className="mt-2 flex flex-col gap-1">
-            {accountLinks.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Button key={item.href} asChild variant="ghost" className="h-10 justify-start rounded-md px-3">
-                  <Link href={item.href}>
-                    <Icon className="h-4 w-4 text-muted-foreground" />
-                    {item.label}
-                  </Link>
-                </Button>
-              );
-            })}
-          </div>
-        </div>
-      </details>
-
-      <LogoutButton className="h-11 rounded-lg px-3 text-destructive hover:text-destructive" />
+        ) : null}
+      </div>
     </div>
   ) : (
     guestDesktopActions
@@ -198,7 +280,7 @@ export function Navbar({
           <p className="text-xs capitalize text-muted-foreground">{effectiveUserRole}</p>
         </div>
       </div>
-      {accountLinks.map((item) => {
+      {mobileAccountLinks.map((item) => {
         const Icon = item.icon;
         return (
           <Button

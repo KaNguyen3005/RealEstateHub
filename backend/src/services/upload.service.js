@@ -1,65 +1,52 @@
-const cloudinary = require("../config/cloudinary");
+const { cloudinary, configureCloudinary } = require("../config/cloudinary");
 const { createHttpError } = require("../utils/httpError");
-const {
-  isAllowedImageMimeType,
-  isValidPropertyImageSize,
-} = require("../utils/upload");
 
-function uploadToCloudinary(fileBuffer) {
+function ensureCloudinaryConfigured() {
+  if (
+    !process.env.CLOUDINARY_CLOUD_NAME ||
+    !process.env.CLOUDINARY_API_KEY ||
+    !process.env.CLOUDINARY_API_SECRET
+  ) {
+    throw createHttpError(500, "Cloudinary is not configured");
+  }
+
+  configureCloudinary();
+}
+
+function uploadBufferToCloudinary(file) {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
+        folder: "realestatehub/properties",
         resource_type: "image",
       },
       (error, result) => {
-        if (error) {
-          return reject(error);
+        if (error || !result?.secure_url) {
+          return reject(error || new Error("Cloudinary upload failed"));
         }
 
-        return resolve(result);
+        return resolve(result.secure_url);
       }
     );
 
-    stream.end(fileBuffer);
+    uploadStream.end(file.buffer);
   });
 }
 
-function validateImageFile(file) {
-  if (!file || !file.buffer) {
-    throw createHttpError(400, "Invalid image file");
-  }
+async function uploadPropertyImages(files = []) {
+  ensureCloudinaryConfigured();
 
-  if (!isAllowedImageMimeType(file.mimetype)) {
-    throw createHttpError(400, "Invalid image type");
-  }
-
-  if (!isValidPropertyImageSize(file.size)) {
-    throw createHttpError(400, "Each image must be 5MB or smaller");
-  }
-
-  return file;
-}
-
-async function uploadPropertyImages(files) {
   if (!Array.isArray(files) || files.length === 0) {
     throw createHttpError(400, "At least one image is required");
   }
 
-  const results = await Promise.all(
-    files.map(async (file) => {
-      validateImageFile(file);
-
-      const result = await uploadToCloudinary(file.buffer);
-      return result.secure_url;
-    })
-  );
+  const urls = await Promise.all(files.map((file) => uploadBufferToCloudinary(file)));
 
   return {
-    urls: results,
+    urls,
   };
 }
 
 module.exports = {
   uploadPropertyImages,
-  validateImageFile,
 };

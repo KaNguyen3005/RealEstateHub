@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api";
+import type { PropertyFormValues } from "@/lib/validations/property.schema";
 import type { Property, PropertyListParams, PropertyListResult } from "@/types/property";
 
 function appendParam(searchParams: URLSearchParams, key: string, value: unknown) {
@@ -52,7 +53,7 @@ export async function getCompareProperties(ids: string[], token?: string | null)
   return response.data?.items ?? [];
 }
 
-export async function createProperty(payload: Partial<Property>, token: string) {
+export async function createProperty(payload: PropertyFormValues, token: string) {
   const response = await apiClient.post<{ item: Property }>("/api/properties", payload, {
     token,
   });
@@ -60,7 +61,7 @@ export async function createProperty(payload: Partial<Property>, token: string) 
   return response.data?.item ?? null;
 }
 
-export async function updateProperty(id: string, payload: Partial<Property>, token: string) {
+export async function updateProperty(id: string, payload: PropertyFormValues, token: string) {
   const response = await apiClient.put<{ item: Property }>(`/api/properties/${id}`, payload, {
     token,
   });

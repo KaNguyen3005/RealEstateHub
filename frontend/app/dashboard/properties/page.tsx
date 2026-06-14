@@ -15,13 +15,21 @@ import type { Property } from "@/types/property";
 
 export default function DashboardPropertiesPage() {
   const accessToken = useAuthStore((state) => state.accessToken);
+  const authStatus = useAuthStore((state) => state.status);
   const [items, setItems] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadProperties = useCallback(async () => {
+    if (authStatus === "bootstrapping") {
+      return;
+    }
+
     if (!accessToken) {
+      setItems([]);
+      setErrorMessage("Please login again before managing properties.");
+      setIsLoading(false);
       return;
     }
 
@@ -36,7 +44,7 @@ export default function DashboardPropertiesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, authStatus]);
 
   useEffect(() => {
     void loadProperties();
@@ -60,8 +68,8 @@ export default function DashboardPropertiesPage() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-2">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Seller dashboard</p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">My properties</h1>

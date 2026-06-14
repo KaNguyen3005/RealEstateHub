@@ -1,63 +1,48 @@
 const multer = require("multer");
 const { createHttpError } = require("../utils/httpError");
-const {
-  allowedImageMimeTypes,
-  maxPropertyImageCount,
-  maxPropertyImageSizeBytes,
-  isAllowedImageMimeType,
-} = require("../utils/upload");
 
-const upload = multer({
+const MAX_PROPERTY_IMAGES = 10;
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+const propertyImageUpload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: maxPropertyImageSizeBytes,
-    files: maxPropertyImageCount,
+    fileSize: MAX_FILE_SIZE_BYTES,
+    files: MAX_PROPERTY_IMAGES,
   },
-  fileFilter: (req, file, cb) => {
-    if (!isAllowedImageMimeType(file.mimetype)) {
-      return cb(createHttpError(400, `Invalid image type. Allowed types: ${allowedImageMimeTypes.join(", ")}`));
+  fileFilter: (_req, file, cb) => {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype)) {
+      return cb(createHttpError(400, "Only JPEG, PNG, and WEBP images are allowed"));
     }
 
     return cb(null, true);
   },
-});
-
-const parseUploadError = (error) => {
-  if (!error) {
-    return null;
-  }
-
-  if (error instanceof multer.MulterError) {
-    if (error.code === "LIMIT_FILE_SIZE") {
-      return createHttpError(400, "Each image must be 5MB or smaller");
-    }
-
-    if (error.code === "LIMIT_FILE_COUNT") {
-      return createHttpError(400, `You can upload up to ${maxPropertyImageCount} images`);
-    }
-
-    if (error.code === "LIMIT_UNEXPECTED_FILE") {
-      return createHttpError(400, "Unexpected file field");
-    }
-  }
-
-  if (error.statusCode) {
-    return error;
-  }
-
-  return createHttpError(400, error.message || "Invalid image upload");
-};
+}).array("images", MAX_PROPERTY_IMAGES);
 
 function uploadPropertyImages(req, res, next) {
-  upload.array("images", maxPropertyImageCount)(req, res, (error) => {
-    if (error) {
-      return next(parseUploadError(error));
+  propertyImageUpload(req, res, (error) => {
+    if (!error) {
+      return next();
     }
 
-    return next();
+    if (error instanceof multer.MulterError) {
+      if (error.code === "LIMIT_FILE_SIZE") {
+        return next(createHttpError(400, "Each image must not exceed 5MB"));
+      }
+
+      if (error.code === "LIMIT_FILE_COUNT") {
+        return next(createHttpError(400, "You can upload up to 10 images"));
+      }
+
+      return next(createHttpError(400, error.message));
+    }
+
+    return next(error);
   });
 }
 
 module.exports = {
+  MAX_PROPERTY_IMAGES,
   uploadPropertyImages,
 };

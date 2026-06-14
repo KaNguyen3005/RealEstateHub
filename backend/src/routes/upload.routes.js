@@ -1,9 +1,9 @@
 const express = require("express");
 const asyncHandler = require("../utils/asyncHandler");
+const uploadController = require("../controllers/upload.controller");
 const protect = require("../middlewares/protect.middleware");
 const allowRoles = require("../middlewares/role.middleware");
 const { uploadPropertyImages } = require("../middlewares/upload.middleware");
-const uploadController = require("../controllers/upload.controller");
 
 const router = express.Router();
 
