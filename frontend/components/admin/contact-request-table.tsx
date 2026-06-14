@@ -5,26 +5,41 @@ interface ContactRequestTableProps {
 }
 
 function getPropertyTitle(request: AdminContactRequest) {
-  return typeof request.propertyId === "object" && request.propertyId ? request.propertyId.title : "Property";
+  return typeof request.propertyId === "object" && request.propertyId ? request.propertyId.title : "Bất động sản";
 }
 
 function getRequesterLabel(request: AdminContactRequest) {
   if (typeof request.userId === "object" && request.userId) {
-    return `${request.name} (${request.userId.role})`;
+    let roleLabel = "khách hàng";
+    if (request.userId.role === "seller") roleLabel = "người bán";
+    if (request.userId.role === "admin") roleLabel = "quản trị";
+
+    return `${request.name} (${roleLabel})`;
   }
 
-  return `${request.name} (guest)`;
+  return `${request.name} (khách vãng lai)`;
+}
+
+function getStatusLabel(status: string) {
+  switch (status) {
+    case "pending":
+      return "Chờ xử lý";
+    case "completed":
+      return "Đã liên hệ";
+    default:
+      return status;
+  }
 }
 
 export function ContactRequestTable({ requests }: ContactRequestTableProps) {
   return (
     <div className="overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-sm">
       <div className="hidden grid-cols-[1fr_1fr_1.5fr_0.5fr_0.7fr] border-b border-border/70 bg-muted/40 px-4 py-3 text-sm font-semibold text-muted-foreground lg:grid">
-        <span>Requester</span>
-        <span>Property</span>
-        <span>Message</span>
-        <span>Status</span>
-        <span>Date</span>
+        <span>Người yêu cầu</span>
+        <span>Bất động sản</span>
+        <span>Lời nhắn</span>
+        <span>Trạng thái</span>
+        <span>Ngày gửi</span>
       </div>
       <div className="divide-y divide-border/70">
         {requests.map((request) => (
@@ -36,7 +51,7 @@ export function ContactRequestTable({ requests }: ContactRequestTableProps) {
             </div>
             <p className="text-sm font-medium text-foreground">{getPropertyTitle(request)}</p>
             <p className="line-clamp-3 text-sm leading-6 text-muted-foreground">{request.message}</p>
-            <span className="text-sm font-medium text-primary">{request.status}</span>
+            <span className="text-sm font-medium text-primary">{getStatusLabel(request.status)}</span>
             <p className="text-sm text-muted-foreground">{new Date(request.createdAt).toLocaleDateString("vi-VN")}</p>
           </div>
         ))}

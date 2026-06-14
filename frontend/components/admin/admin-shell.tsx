@@ -7,10 +7,10 @@ import { BarChart3, ClipboardList, Home, Mail, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const adminLinks = [
-  { href: "/admin", label: "Overview", icon: BarChart3 },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/properties", label: "Properties", icon: Home },
-  { href: "/admin/contact-requests", label: "Requests", icon: Mail },
+  { href: "/admin", label: "Tổng quan", icon: BarChart3 },
+  { href: "/admin/users", label: "Người dùng", icon: Users },
+  { href: "/admin/properties", label: "Bất động sản", icon: Home },
+  { href: "/admin/contact-requests", label: "Yêu cầu", icon: Mail },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -22,11 +22,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="space-y-2">
           <p className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">
             <ClipboardList className="h-4 w-4" />
-            Admin
+            Quản trị viên
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Control center</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Trung tâm điều khiển</h1>
           <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-            Review platform activity, moderate listings, manage accounts, and handle contact requests.
+            Theo dõi hoạt động hệ thống, kiểm duyệt tin đăng, quản lý các tài khoản và xử lý yêu cầu liên hệ.
           </p>
         </div>
 
