@@ -16,6 +16,7 @@ const contactRequestRoutes = require("./routes/contactRequest.routes");
 const favoriteRoutes = require("./routes/favorite.routes");
 const uploadRoutes = require("./routes/upload.routes");
 const conversationRoutes = require("./routes/conversation.routes");
+const adminRoutes = require("./routes/admin.routes");
 const errorMiddleware = require("./middlewares/error.middleware");
 
 const app = express();
@@ -46,6 +47,7 @@ app.use("/api/uploads", uploadRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/contact-requests", contactRequestRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/admin", adminRoutes);
 app.use(errorMiddleware);
 
 async function startServer() {

@@ -1,21 +1,16 @@
 import type { ReactNode } from "react";
+
 import { RoleGuard } from "@/components/auth/role-guard";
-import { RoutePlaceholder } from "@/components/common/route-placeholder";
+import { AdminShell } from "@/components/admin/admin-shell";
 
 export default function AdminLayout({
-  children
+  children,
 }: Readonly<{
   children: ReactNode;
 }>) {
   return (
     <RoleGuard allowedRoles={["admin"]}>
-      <div className="space-y-6">
-        <RoutePlaceholder
-          title="Admin"
-          description="Nested admin layout created for Phase 5. Shared admin navigation will be added later."
-        />
-        <div>{children}</div>
-      </div>
+      <AdminShell>{children}</AdminShell>
     </RoleGuard>
   );
 }
