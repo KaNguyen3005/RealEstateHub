@@ -17,6 +17,7 @@ const favoriteRoutes = require("./routes/favorite.routes");
 const uploadRoutes = require("./routes/upload.routes");
 const conversationRoutes = require("./routes/conversation.routes");
 const adminRoutes = require("./routes/admin.routes");
+const requestLogger = require("./middlewares/requestLogger.middleware");
 const errorMiddleware = require("./middlewares/error.middleware");
 
 const app = express();
@@ -32,6 +33,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(requestLogger);
 
 app.get("/", (req, res) => {
   res.json({
