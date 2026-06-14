@@ -15,6 +15,8 @@ This document tracks Phase 12 testing for RealEstateHub. It follows `docs/04_IMP
 | Seed command | `cd backend && npm run seed` |
 | Backend dev command | `cd backend && npm run dev` |
 | Frontend dev command | `cd frontend && npm run dev` |
+| Frontend unit test command | `cd frontend && npm test` |
+| Frontend E2E command | `cd frontend && npm run e2e` |
 
 ## 3. Seed Accounts
 
@@ -35,6 +37,7 @@ If `.env` overrides `ADMIN_SEED_EMAIL` or `ADMIN_SEED_PASSWORD`, use the values 
 | P12-PRE-03 | Start backend | `cd backend && npm run dev` | Not tested | Backend should listen on `http://localhost:5000`. |
 | P12-PRE-04 | Start frontend | `cd frontend && npm run dev` | Not tested | Frontend should listen on `http://localhost:3000`. |
 | P12-PRE-05 | Import Postman files | Import local environment and Phase 12 collection | Not tested | Select `RealEstateHub Local`. |
+| P12-PRE-06 | Install Playwright browser | `cd frontend && npx playwright install chromium` | Not tested | Required once before running frontend E2E locally or in CI. |
 
 ## 5. Backend API Test Cases
 
@@ -88,12 +91,58 @@ npm run dev
 
 ```powershell
 cd frontend
+npm test
 npm run lint
 npm run build
+npm run e2e
 ```
 
-## 8. Known Notes
+## 8. Automated Test Coverage Added
+
+Backend automated tests:
+
+```powershell
+cd backend
+npm test
+```
+
+Current coverage focus:
+
+- Health endpoint smoke test.
+- Auth service: register, duplicate email, login, blocked user, refresh session, hidden sensitive fields.
+- Property service: validation, public approved listing, ownership checks, compare limit, seller edit lifecycle.
+- Favorite, contact request, admin, and chat business rules.
+
+Frontend automated tests:
+
+```powershell
+cd frontend
+npm test
+```
+
+Current coverage focus:
+
+- Zod validation schemas for auth, property, and contact request forms.
+- Zustand stores for auth, compare, and favorite state.
+- API client JSON requests, auth headers, and error handling.
+
+Frontend E2E smoke tests:
+
+```powershell
+cd frontend
+npx playwright install chromium
+npm run e2e
+```
+
+The E2E runner starts a local mock API and a Next.js dev server automatically. It verifies:
+
+- Guest property discovery: homepage, listing, filtering, detail page, and contact request submission.
+- Compare page loading selected properties from persisted compare state.
+- Login form success state with a mocked backend auth response.
+
+## 9. Known Notes
 
 - Frontend lint/build may show existing `@next/next/no-img-element` warnings for components that still use `<img>`. These warnings do not fail the build.
-- Socket.io and invalid file upload require manual verification unless an automated e2e test framework is added later.
+- Socket.io realtime behavior and invalid file upload still require manual verification or a later dedicated E2E/API test.
 - The Phase 12 Postman collection intentionally creates a new test user and a new pending property so repeated runs do not depend on fragile existing records.
+- `npm run e2e` uses mocked API data and does not replace the Postman collection for backend integration checks.

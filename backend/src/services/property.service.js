@@ -60,6 +60,16 @@ function parseNumber(value, fieldName) {
   return parsed;
 }
 
+function parseQueryNumber(value, fieldName) {
+  const parsed = parseNumber(value, fieldName);
+
+  if (typeof parsed === "undefined") {
+    return undefined;
+  }
+
+  return parsed;
+}
+
 function normalizeStringArray(value, fieldName, { required = false } = {}) {
   if (value === undefined || value === null) {
     if (required) {
@@ -215,10 +225,24 @@ function canViewProperty(user, property) {
   }
 
   if (user.role === "seller") {
-    return String(property.ownerId?._id || property.ownerId) === String(user._id);
+    return isPropertyOwnedByUser(user, property);
   }
 
   return property.status === "approved";
+}
+
+function isPropertyOwnedByUser(user, property) {
+  if (!user || !property) {
+    return false;
+  }
+
+  const ownerId = property.ownerId?._id || property.ownerId;
+
+  if (!ownerId) {
+    return false;
+  }
+
+  return String(ownerId) === String(user._id);
 }
 
 function canModifyProperty(user, property) {
@@ -230,7 +254,7 @@ function canModifyProperty(user, property) {
     return true;
   }
 
-  return String(property.ownerId?._id || property.ownerId) === String(user._id);
+  return isPropertyOwnedByUser(user, property);
 }
 
 function buildPropertyQuery(query = {}) {
@@ -270,11 +294,19 @@ function buildPropertyQuery(query = {}) {
     filter.price = {};
 
     if (query.minPrice) {
-      filter.price.$gte = Number(query.minPrice);
+      filter.price.$gte = parseQueryNumber(query.minPrice, "minPrice");
     }
 
     if (query.maxPrice) {
-      filter.price.$lte = Number(query.maxPrice);
+      filter.price.$lte = parseQueryNumber(query.maxPrice, "maxPrice");
+    }
+
+    if (
+      typeof filter.price.$gte !== "undefined" &&
+      typeof filter.price.$lte !== "undefined" &&
+      filter.price.$gte > filter.price.$lte
+    ) {
+      throw createHttpError(400, "minPrice cannot be greater than maxPrice");
     }
   }
 
@@ -282,11 +314,19 @@ function buildPropertyQuery(query = {}) {
     filter.area = {};
 
     if (query.minArea) {
-      filter.area.$gte = Number(query.minArea);
+      filter.area.$gte = parseQueryNumber(query.minArea, "minArea");
     }
 
     if (query.maxArea) {
-      filter.area.$lte = Number(query.maxArea);
+      filter.area.$lte = parseQueryNumber(query.maxArea, "maxArea");
+    }
+
+    if (
+      typeof filter.area.$gte !== "undefined" &&
+      typeof filter.area.$lte !== "undefined" &&
+      filter.area.$gte > filter.area.$lte
+    ) {
+      throw createHttpError(400, "minArea cannot be greater than maxArea");
     }
   }
 
@@ -364,11 +404,13 @@ async function getPropertiesForCompare(ids, currentUser) {
     };
   }
 
-  if (rawIds.length > 3) {
+  const uniqueIds = [...new Set(rawIds)];
+
+  if (uniqueIds.length > 3) {
     throw createHttpError(400, "You can compare up to 3 properties");
   }
 
-  const validIds = rawIds.filter((id) => isValidObjectId(id));
+  const validIds = uniqueIds.filter((id) => isValidObjectId(id));
 
   if (validIds.length === 0) {
     return {
@@ -383,7 +425,7 @@ async function getPropertiesForCompare(ids, currentUser) {
 
   const propertyById = new Map(properties.map((property) => [String(property._id), property]));
 
-  const items = rawIds
+  const items = uniqueIds
     .map((id) => propertyById.get(id))
     .filter((property) => property && canViewProperty(currentUser, property));
 
@@ -524,6 +566,7 @@ module.exports = {
   deleteProperty,
   updatePropertyStatus,
   canViewProperty,
+  isPropertyOwnedByUser,
   canModifyProperty,
   buildPropertyQuery,
 };

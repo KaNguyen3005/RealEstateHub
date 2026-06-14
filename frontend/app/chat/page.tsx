@@ -52,7 +52,7 @@ export default function ChatPage() {
         setSelectedConversationId(nextSelectedId);
       } catch (error) {
         if (isMounted) {
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load conversations.");
+          setErrorMessage(error instanceof Error ? error.message : "Không thể tải danh sách cuộc trò chuyện.");
         }
       } finally {
         if (isMounted) {
@@ -96,21 +96,21 @@ export default function ChatPage() {
     <ProtectedRoute>
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-8 space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Chat</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Messages</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Trực tuyến</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Tin nhắn</h1>
           <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Continue conversations linked to properties you are interested in.
+            Tiếp tục các cuộc trò chuyện gắn liền với những bất động sản mà bạn đang quan tâm.
           </p>
         </div>
 
         {isLoading ? (
           <div className="rounded-lg border border-border/70 bg-background/90 p-6">
-            <LoadingSpinner label="Loading conversations..." />
+            <LoadingSpinner label="Đang tải hội thoại..." />
           </div>
         ) : errorMessage ? (
-          <EmptyState title="Chat could not load" description={errorMessage} actionLabel="Browse properties" actionHref="/properties" />
+          <EmptyState title="Không thể tải mục tin nhắn" description={errorMessage} actionLabel="Khám phá nhà đất" actionHref="/properties" />
         ) : !accessToken || !user ? (
-          <EmptyState title="Login required" description="Please login before opening chat." actionLabel="Login" actionHref="/login" />
+          <EmptyState title="Yêu cầu đăng nhập" description="Vui lòng đăng nhập tài khoản trước khi truy cập hộp thư." actionLabel="Đăng nhập" actionHref="/login" />
         ) : (
           <div className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
             <aside className="rounded-lg border border-border/70 bg-background/90 p-4 shadow-sm">

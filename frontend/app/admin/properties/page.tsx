@@ -22,7 +22,7 @@ export default function AdminPropertiesPage() {
     }
 
     if (!accessToken) {
-      setErrorMessage("Please login again before moderating properties.");
+      setErrorMessage("Vui lòng đăng nhập lại trước khi thực hiện kiểm duyệt bất động sản.");
       setIsLoading(false);
       return;
     }
@@ -34,7 +34,7 @@ export default function AdminPropertiesPage() {
       const data = await getPendingAdminProperties(accessToken);
       setProperties(data.items);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Failed to load pending properties.");
+      setErrorMessage(error instanceof Error ? error.message : "Không thể tải danh sách bất động sản đang chờ.");
     } finally {
       setIsLoading(false);
     }
@@ -54,16 +54,16 @@ export default function AdminPropertiesPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-2xl font-semibold text-foreground">Pending properties</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Approve, reject, or hide seller submissions.</p>
+        <h2 className="text-2xl font-semibold text-foreground">Bất động sản chờ duyệt</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Phê duyệt, từ chối hoặc ẩn các tin đăng do người bán gửi lên.</p>
       </div>
 
       {isLoading ? (
-        <LoadingSpinner label="Loading pending properties..." />
+        <LoadingSpinner label="Đang tải danh sách bất động sản chờ duyệt..." />
       ) : errorMessage ? (
-        <EmptyState title="Pending properties could not load" description={errorMessage} actionLabel="Try again" onAction={loadProperties} />
+        <EmptyState title="Không thể tải danh sách chờ duyệt" description={errorMessage} actionLabel="Thử lại" onAction={loadProperties} />
       ) : properties.length === 0 ? (
-        <EmptyState title="No pending properties" description="All property submissions have been reviewed." />
+        <EmptyState title="Không có bất động sản nào đang chờ" description="Tất cả các tin đăng gửi lên đều đã được kiểm duyệt xong." />
       ) : (
         <PropertyApprovalTable properties={properties} onModerate={handleModerate} />
       )}

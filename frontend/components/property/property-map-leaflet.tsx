@@ -105,8 +105,8 @@ export default function PropertyMapLeaflet({
               <p className="font-semibold text-foreground">{property.title}</p>
               <p className="text-primary">{formatPrice(property.price, property.purpose)}</p>
               <p className="text-muted-foreground">{formatAddress(property)}</p>
-              <Link href={`/properties/${property._id}`} className="font-medium text-primary">
-                View detail
+              <Link href={`/properties/${property._id}`} className="font-medium text-primary hover:underline">
+                Xem chi tiết
               </Link>
             </div>
           </Popup>
@@ -117,8 +117,8 @@ export default function PropertyMapLeaflet({
         <Marker position={[selectedLocation.latitude, selectedLocation.longitude]} icon={markerIcon}>
           <Popup>
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-foreground">Selected property location</p>
-              <p className="text-muted-foreground">Click the map to adjust this marker.</p>
+              <p className="font-semibold text-foreground">Vị trí bất động sản đã chọn</p>
+              <p className="text-muted-foreground">Click vị trí khác trên bản đồ để thay đổi điểm ghim.</p>
             </div>
           </Popup>
         </Marker>

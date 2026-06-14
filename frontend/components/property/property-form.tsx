@@ -40,6 +40,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationSuccess, setLocationSuccess] = useState<string | null>(null);
   const [isFindingLocation, setIsFindingLocation] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -67,6 +68,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
       amenities: (initialProperty?.amenities ?? []).join(", "),
     },
   });
+
   const imageUrls = watch("images") ?? [];
   const address = watch("address");
   const city = watch("city");
@@ -74,6 +76,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
   const ward = watch("ward");
   const latitude = parseCoordinate(watch("latitude"));
   const longitude = parseCoordinate(watch("longitude"));
+
   const selectedLocation =
     typeof latitude === "number" && typeof longitude === "number"
       ? {
@@ -114,7 +117,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
       });
       setLocationSuccess(result.label);
     } catch (error) {
-      setLocationError(error instanceof Error ? error.message : "Location lookup failed.");
+      setLocationError(error instanceof Error ? error.message : "Tìm kiếm vị trí thất bại.");
     } finally {
       setIsFindingLocation(false);
     }
@@ -126,9 +129,9 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
 
     try {
       await onSubmit(values);
-      setSubmitSuccess("Property saved successfully.");
+      setSubmitSuccess("Đã lưu thông tin bất động sản thành công.");
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Failed to save property.");
+      setSubmitError(error instanceof Error ? error.message : "Không thể lưu thông tin bất động sản.");
     }
   });
 
@@ -136,18 +139,18 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
     <form className="space-y-6 rounded-lg border border-border/70 bg-background/90 p-5 shadow-sm" onSubmit={handleValidSubmit}>
       <div className="grid gap-5 md:grid-cols-2">
         <div className="md:col-span-2">
-          <Label htmlFor="title">Title</Label>
+          <Label htmlFor="title">Tiêu đề</Label>
           <Input id="title" className={cn(fieldClassName, errors.title && "border-destructive")} {...register("title")} />
           {errors.title ? <p className="mt-2 text-sm text-destructive">{errors.title.message}</p> : null}
         </div>
 
         <div className="md:col-span-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">Mô tả chi tiết</Label>
           <textarea
             id="description"
             rows={5}
             className={cn(
-              "mt-2 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none",
+              "mt-2 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring",
               errors.description && "border-destructive"
             )}
             {...register("description")}
@@ -156,69 +159,69 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
         </div>
 
         <div>
-          <Label htmlFor="type">Type</Label>
-          <select id="type" className={cn(fieldClassName, "flex h-10 w-full rounded-md border px-3 py-2 text-sm")} {...register("type")}>
-            <option value="apartment">Apartment</option>
-            <option value="house">House</option>
-            <option value="land">Land</option>
-            <option value="villa">Villa</option>
-            <option value="office">Office</option>
+          <Label htmlFor="type">Loại bất động sản</Label>
+          <select id="type" className={cn(fieldClassName, "flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none")} {...register("type")}>
+            <option value="apartment">Căn hộ / Chung cư</option>
+            <option value="house">Nhà ở</option>
+            <option value="land">Đất nền</option>
+            <option value="villa">Biệt thự</option>
+            <option value="office">Văn phòng</option>
           </select>
           {errors.type ? <p className="mt-2 text-sm text-destructive">{errors.type.message}</p> : null}
         </div>
 
         <div>
-          <Label htmlFor="purpose">Purpose</Label>
-          <select id="purpose" className={cn(fieldClassName, "flex h-10 w-full rounded-md border px-3 py-2 text-sm")} {...register("purpose")}>
-            <option value="sale">Sale</option>
-            <option value="rent">Rent</option>
+          <Label htmlFor="purpose">Nhu cầu</Label>
+          <select id="purpose" className={cn(fieldClassName, "flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none")} {...register("purpose")}>
+            <option value="sale">Bán</option>
+            <option value="rent">Cho thuê</option>
           </select>
           {errors.purpose ? <p className="mt-2 text-sm text-destructive">{errors.purpose.message}</p> : null}
         </div>
 
         <div>
-          <Label htmlFor="price">Price</Label>
+          <Label htmlFor="price">Giá trị (VND)</Label>
           <Input id="price" type="number" min="1" className={cn(fieldClassName, errors.price && "border-destructive")} {...register("price")} />
           {errors.price ? <p className="mt-2 text-sm text-destructive">{errors.price.message}</p> : null}
         </div>
 
         <div>
-          <Label htmlFor="area">Area</Label>
+          <Label htmlFor="area">Diện tích (m²)</Label>
           <Input id="area" type="number" min="1" className={cn(fieldClassName, errors.area && "border-destructive")} {...register("area")} />
           {errors.area ? <p className="mt-2 text-sm text-destructive">{errors.area.message}</p> : null}
         </div>
 
         <div>
-          <Label htmlFor="bedrooms">Bedrooms</Label>
+          <Label htmlFor="bedrooms">Số phòng ngủ</Label>
           <Input id="bedrooms" type="number" min="0" className={fieldClassName} {...register("bedrooms")} />
           {errors.bedrooms ? <p className="mt-2 text-sm text-destructive">{errors.bedrooms.message}</p> : null}
         </div>
 
         <div>
-          <Label htmlFor="bathrooms">Bathrooms</Label>
+          <Label htmlFor="bathrooms">Số phòng tắm / WC</Label>
           <Input id="bathrooms" type="number" min="0" className={fieldClassName} {...register("bathrooms")} />
           {errors.bathrooms ? <p className="mt-2 text-sm text-destructive">{errors.bathrooms.message}</p> : null}
         </div>
 
         <div className="md:col-span-2">
-          <Label htmlFor="address">Address</Label>
+          <Label htmlFor="address">Địa chỉ (Số nhà, tên đường)</Label>
           <Input id="address" className={cn(fieldClassName, errors.address && "border-destructive")} {...register("address")} />
           {errors.address ? <p className="mt-2 text-sm text-destructive">{errors.address.message}</p> : null}
         </div>
 
         <div>
-          <Label htmlFor="city">City</Label>
+          <Label htmlFor="city">Tỉnh / Thành phố</Label>
           <Input id="city" className={cn(fieldClassName, errors.city && "border-destructive")} {...register("city")} />
           {errors.city ? <p className="mt-2 text-sm text-destructive">{errors.city.message}</p> : null}
         </div>
 
         <div>
-          <Label htmlFor="district">District</Label>
+          <Label htmlFor="district">Quận / Huyện</Label>
           <Input id="district" className={fieldClassName} {...register("district")} />
         </div>
 
         <div>
-          <Label htmlFor="ward">Ward</Label>
+          <Label htmlFor="ward">Phường / Xã</Label>
           <Input id="ward" className={fieldClassName} {...register("ward")} />
         </div>
 
@@ -229,21 +232,21 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
           <div className="rounded-lg border border-border/70 bg-muted/20 p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <Label>Property location</Label>
+                <Label>Vị trí bất động sản</Label>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Find the location from the address, then click the map if the marker needs adjustment.
+                  Tìm vị trí dựa trên địa chỉ đã nhập, sau đó click hoặc kéo thả trên bản đồ nếu cần điều chỉnh điểm ghim.
                 </p>
               </div>
               <Button type="button" variant="outline" onClick={handleFindLocation} disabled={isFindingLocation}>
                 {isFindingLocation ? (
                   <>
                     <Search className="h-4 w-4 animate-pulse" />
-                    Finding...
+                    Đang tìm...
                   </>
                 ) : (
                   <>
                     <MapPin className="h-4 w-4" />
-                    Find location
+                    Tìm vị trí
                   </>
                 )}
               </Button>
@@ -259,7 +262,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
                 onLocationSelect={(location) => {
                   updateLocation(location);
                   setLocationError(null);
-                  setLocationSuccess("Location selected from the map.");
+                  setLocationSuccess("Đã chọn vị trí trực tiếp từ bản đồ.");
                 }}
               />
             </div>
@@ -267,10 +270,10 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
             <div className="mt-3 space-y-1 text-sm">
               {selectedLocation ? (
                 <p className="text-muted-foreground">
-                  Selected coordinates: {selectedLocation.latitude.toFixed(6)}, {selectedLocation.longitude.toFixed(6)}
+                  Tọa độ đã chọn: {selectedLocation.latitude.toFixed(6)}, {selectedLocation.longitude.toFixed(6)}
                 </p>
               ) : (
-                <p className="text-muted-foreground">No location selected yet.</p>
+                <p className="text-muted-foreground">Chưa có vị trí nào được chọn.</p>
               )}
               {locationSuccess ? <p className="text-emerald-700">{locationSuccess}</p> : null}
               {locationError ? <p className="text-destructive">{locationError}</p> : null}
@@ -289,9 +292,9 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
         </div>
 
         <div className="md:col-span-2">
-          <Label htmlFor="amenities">Amenities</Label>
-          <Input id="amenities" placeholder="Parking, Balcony, Security" className={fieldClassName} {...register("amenities")} />
-          <p className="mt-2 text-xs text-muted-foreground">Optional. Separate multiple items with commas.</p>
+          <Label htmlFor="amenities">Tiện ích đi kèm</Label>
+          <Input id="amenities" placeholder="Bãi đậu xe, Ban công, An ninh 24/7" className={fieldClassName} {...register("amenities")} />
+          <p className="mt-2 text-xs text-muted-foreground">Không bắt buộc. Phân tách các tiện ích bằng dấu phẩy.</p>
         </div>
       </div>
 
@@ -303,7 +306,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
           {submitLabel}
         </LoadingButton>
         <Button asChild type="button" variant="ghost">
-          <Link href="/dashboard/properties">Cancel</Link>
+          <Link href="/dashboard/properties">Hủy bỏ</Link>
         </Button>
       </div>
     </form>

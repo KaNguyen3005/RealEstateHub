@@ -35,20 +35,31 @@ interface NavbarProps {
 }
 
 const publicLinks = [
-  { href: "/properties", label: "Properties" },
-  { href: "/compare", label: "Compare" }
+  { href: "/properties", label: "Bất động sản" },
+  { href: "/compare", label: "So sánh" }
 ] as const;
 
 const authenticatedLinks: AccountLink[] = [
-  { href: "/profile", label: "Profile", icon: User },
-  { href: "/chat", label: "Chat", icon: MessageSquare }
+  { href: "/profile", label: "Trang cá nhân", icon: User },
+  { href: "/chat", label: "Trò chuyện", icon: MessageSquare }
 ];
 
 const mobileAuthenticatedLinks: AccountLink[] = [
-  { href: "/profile", label: "Profile", icon: User },
-  { href: "/favorites", label: "Favorites", icon: Heart },
-  { href: "/chat", label: "Chat", icon: MessageSquare }
+  { href: "/profile", label: "Trang cá nhân", icon: User },
+  { href: "/favorites", label: "Tin yêu thích", icon: Heart },
+  { href: "/chat", label: "Trò chuyện", icon: MessageSquare }
 ];
+
+function getRoleLabel(role: UserRole): string {
+  switch (role) {
+    case "admin":
+      return "Quản trị viên";
+    case "seller":
+      return "Người môi giới / Người bán";
+    default:
+      return "Khách hàng";
+  }
+}
 
 export function Navbar({
   isAuthenticated: isAuthenticatedProp = false,
@@ -67,18 +78,18 @@ export function Navbar({
   const isResolvingAuth = authStatus === "bootstrapping";
   const isAuthenticated = (authStatus === "authenticated" && storeIsAuthenticated) || isAuthenticatedProp;
   const effectiveUserRole = isAuthenticated ? storeUserRole : userRole;
-  const displayName = storeUser?.fullName || storeUser?.email || "Account";
+  const displayName = storeUser?.fullName || storeUser?.email || "Tài khoản";
   const userInitials =
     displayName
       .split(" ")
       .filter(Boolean)
-      .slice(0, 2)
+      .slice(-2) // Lấy chữ cái của Họ & Tên trong tiếng Việt chuẩn hơn
       .map((part) => part[0]?.toUpperCase())
-      .join("") || "A";
+      .join("") || "TK";
   const closeMobileMenu = () => setMobileOpen(false);
 
   const resolvingDesktopActions = (
-    <div className="flex items-center gap-2" aria-label="Checking session">
+    <div className="flex items-center gap-2" aria-label="Đang kiểm tra phiên đăng nhập">
       <div className="h-10 w-20 animate-pulse rounded-md border border-border/70 bg-muted/50" />
       <div className="h-10 w-24 animate-pulse rounded-md bg-muted/60" />
     </div>
@@ -87,16 +98,16 @@ export function Navbar({
   const guestDesktopActions = (
     <>
       <Button asChild variant="ghost">
-        <Link href="/login">Login</Link>
+        <Link href="/login">Đăng nhập</Link>
       </Button>
       <Button asChild>
-        <Link href="/register">Register</Link>
+        <Link href="/register">Đăng ký</Link>
       </Button>
     </>
   );
 
   const resolvingMobileActions = (
-    <div className="flex gap-2" aria-label="Checking session">
+    <div className="flex gap-2" aria-label="Đang kiểm tra phiên đăng nhập">
       <div className="h-10 flex-1 animate-pulse rounded-md border border-border/70 bg-muted/50" />
       <div className="h-10 flex-1 animate-pulse rounded-md bg-muted/60" />
     </div>
@@ -110,10 +121,10 @@ export function Navbar({
         className="flex-1"
         onClick={closeMobileMenu}
       >
-        <Link href="/login">Login</Link>
+        <Link href="/login">Đăng nhập</Link>
       </Button>
       <Button asChild className="flex-1" onClick={closeMobileMenu}>
-        <Link href="/register">Register</Link>
+        <Link href="/register">Đăng ký</Link>
       </Button>
     </div>
   );
@@ -126,26 +137,28 @@ export function Navbar({
     const links: AccountLink[] = [...mobileAuthenticatedLinks];
 
     if (effectiveUserRole === "seller") {
-      links.push({ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard });
+      links.push({ href: "/dashboard", label: "Trang quản lý", icon: LayoutDashboard });
     }
 
     if (effectiveUserRole === "admin") {
-      links.push({ href: "/admin", label: "Admin", icon: Shield });
+      links.push({ href: "/admin", label: "Quản trị hệ thống", icon: Shield });
     }
 
     return links;
   }, [effectiveUserRole]);
+
   const managementLink = useMemo<AccountLink | null>(() => {
     if (effectiveUserRole === "seller") {
-      return { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard };
+      return { href: "/dashboard", label: "Trang quản lý", icon: LayoutDashboard };
     }
 
     if (effectiveUserRole === "admin") {
-      return { href: "/admin", label: "Admin", icon: Shield };
+      return { href: "/admin", label: "Quản trị", icon: Shield };
     }
 
     return null;
   }, [effectiveUserRole]);
+
   const isActivePath = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const ManagementIcon = managementLink?.icon;
 
@@ -204,7 +217,7 @@ export function Navbar({
       >
         <Link href="/favorites">
           <Heart className="h-4 w-4" />
-          Favorites
+          Yêu thích
         </Link>
       </Button>
 
@@ -217,14 +230,14 @@ export function Navbar({
           aria-haspopup="menu"
           onClick={() => setAccountOpen((isOpen) => !isOpen)}
         >
-            <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
-              {userInitials}
-            </span>
-            <span className="hidden max-w-36 truncate text-left text-sm font-medium lg:inline">
-              {displayName}
-            </span>
-            <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", accountOpen && "rotate-180")} />
-          </Button>
+          <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
+            {userInitials}
+          </span>
+          <span className="hidden max-w-36 truncate text-left text-sm font-medium lg:inline">
+            {displayName}
+          </span>
+          <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", accountOpen && "rotate-180")} />
+        </Button>
 
         {accountOpen ? (
           <div
@@ -237,7 +250,7 @@ export function Navbar({
               </span>
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-foreground">{displayName}</p>
-                <p className="text-xs capitalize text-muted-foreground">{effectiveUserRole}</p>
+                <p className="text-xs text-muted-foreground">{getRoleLabel(effectiveUserRole)}</p>
               </div>
             </div>
 
@@ -277,7 +290,7 @@ export function Navbar({
         </span>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-foreground">{displayName}</p>
-          <p className="text-xs capitalize text-muted-foreground">{effectiveUserRole}</p>
+          <p className="text-xs text-muted-foreground">{getRoleLabel(effectiveUserRole)}</p>
         </div>
       </div>
       {mobileAccountLinks.map((item) => {
@@ -322,7 +335,7 @@ export function Navbar({
           <span className="text-lg">RealEstateHub</span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Menu chính">
           {publicLinks.map((item) => (
             <Button
               key={item.href}
@@ -343,7 +356,7 @@ export function Navbar({
           type="button"
           className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition-colors hover:bg-accent md:hidden"
           onClick={() => setMobileOpen((value) => !value)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
           aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -359,7 +372,7 @@ export function Navbar({
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-3">
           <div className="flex items-center gap-2 rounded-2xl border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
             <Search className="h-4 w-4 text-primary" />
-            Search, compare, and explore properties
+            Tìm kiếm, so sánh và khám phá nhà đất
           </div>
 
           <div className="flex flex-col gap-1">

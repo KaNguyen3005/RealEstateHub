@@ -14,7 +14,7 @@ interface ConversationListProps {
 }
 
 function getPropertyTitle(conversation: ChatConversation) {
-  return typeof conversation.propertyId === "string" ? "Property conversation" : conversation.propertyId.title;
+  return typeof conversation.propertyId === "string" ? "Cuộc trò chuyện về bất động sản" : conversation.propertyId.title;
 }
 
 function getOtherParticipant(conversation: ChatConversation, currentUserId: string): ChatParticipant | null {
@@ -34,8 +34,8 @@ export function ConversationList({ conversations, selectedConversationId, curren
     return (
       <div className="rounded-lg border border-dashed border-border bg-muted/20 p-6 text-center">
         <MessageSquare className="mx-auto h-8 w-8 text-muted-foreground" />
-        <p className="mt-3 text-sm font-medium text-foreground">No conversations yet</p>
-        <p className="mt-1 text-sm text-muted-foreground">Start from a property detail page.</p>
+        <p className="mt-3 text-sm font-medium text-foreground">Chưa có cuộc trò chuyện nào</p>
+        <p className="mt-1 text-sm text-muted-foreground">Hãy bắt đầu trò chuyện từ trang chi tiết của một bất động sản.</p>
       </div>
     );
   }
@@ -63,8 +63,8 @@ export function ConversationList({ conversations, selectedConversationId, curren
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-foreground">{getPropertyTitle(conversation)}</p>
-              <p className="truncate text-xs text-muted-foreground">{otherParticipant?.fullName ?? "Participant"}</p>
-              <p className="mt-1 truncate text-xs text-muted-foreground">{conversation.lastMessage || "No messages yet"}</p>
+              <p className="truncate text-xs text-muted-foreground">{otherParticipant?.fullName ?? "Người dùng"}</p>
+              <p className="mt-1 truncate text-xs text-muted-foreground">{conversation.lastMessage || "Chưa có tin nhắn nào"}</p>
             </div>
           </Button>
         );

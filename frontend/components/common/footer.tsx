@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const footerLinks = [
-  { href: "/properties", label: "Properties" },
-  { href: "/compare", label: "Compare" },
-  { href: "/login", label: "Login" },
-  { href: "/register", label: "Register" }
+  { href: "/properties", label: "Bất động sản" },
+  { href: "/compare", label: "So sánh" },
+  { href: "/login", label: "Đăng nhập" },
+  { href: "/register", label: "Đăng ký" }
 ] as const;
 
 export function Footer() {
@@ -18,18 +18,18 @@ export function Footer() {
             </span>
             <div>
               <p className="font-semibold tracking-tight">RealEstateHub</p>
-              <p className="text-sm text-muted-foreground">A mini real estate marketplace for buying, renting, and comparing properties.</p>
+              <p className="text-sm text-muted-foreground">Sàn thương mại bất động sản thu nhỏ giúp mua bán, cho thuê và so sánh dự án.</p>
             </div>
           </div>
           <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-            Browse listings, compare properties, save favorites, and connect with sellers in one responsive platform.
+            Duyệt danh sách tin đăng, so sánh các bất động sản, lưu tin yêu thích và kết nối trực tiếp với người bán trên một nền tảng mượt mà.
           </p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
             <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Quick Links
+              Liên kết nhanh
             </p>
             <div className="flex flex-col gap-3">
               {footerLinks.map((item) => (
@@ -46,11 +46,11 @@ export function Footer() {
 
           <div>
             <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Contact
+              Liên hệ & Hỗ trợ
             </p>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Support for users, sellers, and admins</p>
-              <p>Responsive across mobile, tablet, and desktop</p>
+              <p>Hỗ trợ người dùng, người bán và quản trị viên</p>
+              <p>Giao diện tối ưu trên di động, máy tính bảng và máy tính</p>
             </div>
           </div>
         </div>
@@ -58,8 +58,8 @@ export function Footer() {
 
       <div className="border-t border-border/60">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <p>© 2026 RealEstateHub. All rights reserved.</p>
-          <p>Built with Next.js App Router and Tailwind CSS.</p>
+          <p>© 2026 RealEstateHub. Giữ toàn bộ bản quyền.</p>
+          <p>Phát triển bằng Next.js App Router và Tailwind CSS.</p>
         </div>
       </div>
     </footer>

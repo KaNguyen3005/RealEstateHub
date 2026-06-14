@@ -45,7 +45,7 @@ export default function FavoritesPage() {
         }
       } catch (error) {
         if (isMounted) {
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load favorites.");
+          setErrorMessage(error instanceof Error ? error.message : "Không thể tải danh sách yêu thích.");
         }
       } finally {
         if (isMounted) {
@@ -65,21 +65,21 @@ export default function FavoritesPage() {
     <ProtectedRoute>
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-8 space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Favorites</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Saved properties</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Yêu thích</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Danh sách đã lưu</h1>
           <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Properties saved to your account.
+            Các bất động sản bạn đã lưu vào tài khoản cá nhân.
           </p>
         </div>
 
         {isLoading ? (
           <div className="flex min-h-[40vh] items-center justify-center">
-            <LoadingSpinner label="Loading favorites..." />
+            <LoadingSpinner label="Đang tải danh sách yêu thích..." />
           </div>
         ) : errorMessage ? (
-          <EmptyState title="Favorites could not load" description={errorMessage} actionLabel="Browse properties" actionHref="/properties" />
+          <EmptyState title="Không thể tải danh sách yêu thích" description={errorMessage} actionLabel="Khám phá nhà đất" actionHref="/properties" />
         ) : items.length === 0 ? (
-          <EmptyState title="No saved properties" description="Save properties from the listing page to see them here." actionLabel="Browse properties" actionHref="/properties" />
+          <EmptyState title="Chưa có bất động sản nào được lưu" description={ "Hãy lưu các bất động sản từ trang danh sách để xem lại tại đây."} actionLabel="Khám phá nhà đất" actionHref="/properties" />
         ) : (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {items.map((property) => (
