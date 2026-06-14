@@ -62,12 +62,12 @@ export function LoginForm({ initialNotice = null, nextPath = null }: LoginFormPr
       );
 
       if (!response.data?.user || !response.data?.accessToken) {
-        throw new Error("Login response is incomplete");
+        throw new Error("Phản hồi đăng nhập không hợp lệ");
       }
 
       setAuth(response.data.user, response.data.accessToken);
       setSubmitSuccess(
-        response.message || "Login successful. Your session has been created."
+        response.message || "Đăng nhập thành công. Phiên làm việc của bạn đã được khởi tạo."
       );
       reset({
         email: values.email,
@@ -77,11 +77,11 @@ export function LoginForm({ initialNotice = null, nextPath = null }: LoginFormPr
       router.replace(getSafeNextPath(nextPath) || getRoleHomePath(response.data.user.role));
     } catch (error) {
       if (error instanceof ApiClientError) {
-        setSubmitError(error.message || "Login failed");
+        setSubmitError(error.message || "Đăng nhập thất bại");
         return;
       }
 
-      setSubmitError("Login failed. Please try again.");
+      setSubmitError("Đăng nhập thất bại. Vui lòng thử lại sau.");
     }
   });
 
@@ -90,13 +90,13 @@ export function LoginForm({ initialNotice = null, nextPath = null }: LoginFormPr
       <div className="rounded-[28px] border border-border/70 bg-background/85 p-6 shadow-[0_20px_60px_rgba(53,36,20,0.08)] backdrop-blur-xl sm:p-8">
         <div className="mb-8 space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">
-            Welcome back
+            Chào mừng trở lại
           </p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Login to RealEstateHub
+            Đăng nhập vào RealEstateHub
           </h1>
           <p className="max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Sign in with your email and password to continue.
+            Đăng nhập bằng email và mật khẩu của bạn để tiếp tục.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export function LoginForm({ initialNotice = null, nextPath = null }: LoginFormPr
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="vi-du@example.com"
                 autoComplete="email"
                 aria-invalid={Boolean(errors.email)}
                 className={cn(
@@ -128,11 +128,11 @@ export function LoginForm({ initialNotice = null, nextPath = null }: LoginFormPr
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mật khẩu</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Nhập mật khẩu của bạn"
                 autoComplete="current-password"
                 aria-invalid={Boolean(errors.password)}
                 className={cn(
@@ -161,10 +161,10 @@ export function LoginForm({ initialNotice = null, nextPath = null }: LoginFormPr
 
           <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center">
             <LoadingButton type="submit" loading={isSubmitting} className="w-full sm:w-auto">
-              Login
+              Đăng nhập
             </LoadingButton>
             <Button asChild type="button" variant="ghost" className="w-full sm:w-auto">
-              <Link href="/register">Create a new account</Link>
+              <Link href="/register">Tạo tài khoản mới</Link>
             </Button>
           </div>
         </form>
