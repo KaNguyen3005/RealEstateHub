@@ -35,6 +35,28 @@ describe("Contact request service", () => {
     expect(request.userId).toBeUndefined();
   });
 
+  it("normalizes guest contact request fields before saving", async () => {
+    const seller = await createTestUser({ role: "seller" });
+    const property = await createTestProperty(seller._id, { status: "approved" });
+
+    const request = await contactRequestService.createContactRequest(
+      buildContactPayload(property._id, {
+        name: "  Interested Buyer  ",
+        email: "  BUYER@EXAMPLE.COM  ",
+        phone: "  0901234567  ",
+        message: "  I would like to schedule a viewing.  "
+      }),
+      null
+    );
+
+    expect(request).toMatchObject({
+      name: "Interested Buyer",
+      email: "buyer@example.com",
+      phone: "0901234567",
+      message: "I would like to schedule a viewing."
+    });
+  });
+
   it("attaches the current user when a logged-in user submits a contact request", async () => {
     const seller = await createTestUser({ role: "seller" });
     const buyer = await createTestUser({ role: "user" });
@@ -60,6 +82,18 @@ describe("Contact request service", () => {
     ).rejects.toMatchObject({
       statusCode: 400,
       message: "email is invalid"
+    });
+  });
+
+  it("rejects contact requests for a missing property", async () => {
+    await expect(
+      contactRequestService.createContactRequest(
+        buildContactPayload("64b000000000000000000001"),
+        null
+      )
+    ).rejects.toMatchObject({
+      statusCode: 404,
+      message: "Property not found"
     });
   });
 

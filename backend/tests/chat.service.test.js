@@ -56,6 +56,31 @@ describe("Chat services", () => {
     });
   });
 
+  it("excludes closed-property conversations from a user's conversation list", async () => {
+    const seller = await createTestUser({ role: "seller" });
+    const buyer = await createTestUser({ role: "user" });
+    const openProperty = await createTestProperty(seller._id, {
+      title: "Open Chat Home",
+      status: "approved"
+    });
+    const closingProperty = await createTestProperty(seller._id, {
+      title: "Closing Chat Home",
+      status: "approved"
+    });
+
+    await conversationService.createOrGetConversation(openProperty._id, buyer);
+    await conversationService.createOrGetConversation(closingProperty._id, buyer);
+
+    closingProperty.status = "sold";
+    await closingProperty.save();
+
+    const result = await conversationService.getConversationsByUser(buyer._id);
+    const propertyTitles = result.items.map((conversation) => conversation.propertyId.title);
+
+    expect(result.totalItems).toBe(1);
+    expect(propertyTitles).toEqual(["Open Chat Home"]);
+  });
+
   it("saves messages from participants and updates lastMessage", async () => {
     const seller = await createTestUser({ role: "seller" });
     const buyer = await createTestUser({ role: "user" });
@@ -82,6 +107,18 @@ describe("Chat services", () => {
     ).rejects.toMatchObject({
       statusCode: 403,
       message: "You are not a participant of this conversation"
+    });
+  });
+
+  it("rejects blank chat messages after trimming content", async () => {
+    const seller = await createTestUser({ role: "seller" });
+    const buyer = await createTestUser({ role: "user" });
+    const property = await createTestProperty(seller._id, { status: "approved" });
+    const { conversation } = await conversationService.createOrGetConversation(property._id, buyer);
+
+    await expect(messageService.createMessage(conversation._id, "   ", buyer)).rejects.toMatchObject({
+      statusCode: 400,
+      message: "content is required"
     });
   });
 

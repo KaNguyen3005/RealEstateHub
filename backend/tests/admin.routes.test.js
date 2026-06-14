@@ -30,6 +30,18 @@ describe("Admin routes", () => {
     });
   });
 
+  it("rejects admin requests with an invalid access token", async () => {
+    const response = await request(app)
+      .get("/api/admin/stats")
+      .set("Authorization", "Bearer invalid-token")
+      .expect(401);
+
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Invalid access token"
+    });
+  });
+
   it("rejects non-admin users", async () => {
     const user = await createTestUser({ role: "user" });
 

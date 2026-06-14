@@ -56,6 +56,34 @@ describe("Property service", () => {
     expect(result.items[0].status).toBe("approved");
   });
 
+  it("rejects invalid price range filters", async () => {
+    await expect(
+      propertyService.getProperties({ minPrice: "2000000000", maxPrice: "1000000000" }, null)
+    ).rejects.toMatchObject({
+      statusCode: 400,
+      message: "minPrice cannot be greater than maxPrice"
+    });
+  });
+
+  it("hides pending property detail from public users but allows admin access", async () => {
+    const seller = await createTestUser({ role: "seller" });
+    const admin = await createTestUser({ role: "admin" });
+    const property = await createTestProperty(seller._id, {
+      title: "Pending Admin Visible Home",
+      status: "pending"
+    });
+
+    await expect(propertyService.getPropertyById(property._id, null)).rejects.toMatchObject({
+      statusCode: 404,
+      message: "Property not found"
+    });
+
+    const adminProperty = await propertyService.getPropertyById(property._id, admin);
+
+    expect(adminProperty.title).toBe("Pending Admin Visible Home");
+    expect(adminProperty.status).toBe("pending");
+  });
+
   it("prevents a seller from updating another seller's property", async () => {
     const owner = await createTestUser({ role: "seller" });
     const otherSeller = await createTestUser({ role: "seller" });
