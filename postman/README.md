@@ -1,6 +1,6 @@
 # Postman
 
-## Auth Collection
+## Collections
 
 Files:
 
