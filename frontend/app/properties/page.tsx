@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/common/empty-state";
 import { PropertyCard } from "@/components/property/property-card";
 import { PropertyFilter } from "@/components/property/property-filter";
+import { PropertyMap } from "@/components/property/property-map";
 import { Button } from "@/components/ui/button";
 import { buildPropertyQuery, getProperties } from "@/lib/properties";
 import type { PropertyListParams } from "@/types/property";
@@ -67,10 +68,15 @@ export default async function PropertiesPage({ searchParams = {} }: PropertiesPa
                 Page {data.page} of {data.totalPages}
               </span>
             </div>
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {data.items.map((property) => (
-                <PropertyCard key={property._id} property={property} />
-              ))}
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+              <div className="grid gap-5 md:grid-cols-2">
+                {data.items.map((property) => (
+                  <PropertyCard key={property._id} property={property} />
+                ))}
+              </div>
+              <div className="xl:sticky xl:top-24 xl:self-start">
+                <PropertyMap properties={data.items} zoom={11} />
+              </div>
             </div>
 
             <div className="flex items-center justify-center gap-3">

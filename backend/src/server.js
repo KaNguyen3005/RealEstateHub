@@ -7,6 +7,8 @@ const connectDB = require("./config/db");
 const healthRoutes = require("./routes/health.routes");
 const authRoutes = require("./routes/auth.routes");
 const propertyRoutes = require("./routes/property.routes");
+const favoriteRoutes = require("./routes/favorite.routes")
+const uploadRoutes = require("./routes/upload.routes")
 const errorMiddleware = require("./middlewares/error.middleware");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });

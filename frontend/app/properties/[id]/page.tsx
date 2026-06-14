@@ -5,6 +5,7 @@ import { Bath, BedDouble, MapPin, Ruler, UserRound } from "lucide-react";
 import { CompareButton } from "@/components/property/compare-button";
 import { FavoriteButton } from "@/components/property/favorite-button";
 import { PropertyGallery } from "@/components/property/property-gallery";
+import { PropertyMap } from "@/components/property/property-map";
 import { PropertyStatusBadge } from "@/components/property/property-status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -108,20 +109,24 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
           <p className="mt-3 whitespace-pre-line text-sm leading-7 text-muted-foreground">{property.description}</p>
         </article>
 
-        <article className="rounded-lg border border-border/70 bg-background/90 p-5 shadow-sm">
-          <h2 className="text-xl font-semibold text-foreground">Amenities</h2>
-          {property.amenities.length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {property.amenities.map((amenity) => (
-                <span key={amenity} className="rounded-md bg-muted px-3 py-1.5 text-sm text-muted-foreground">
-                  {amenity}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-muted-foreground">No amenities listed.</p>
-          )}
-        </article>
+        <div className="space-y-6">
+          <article className="rounded-lg border border-border/70 bg-background/90 p-5 shadow-sm">
+            <h2 className="text-xl font-semibold text-foreground">Amenities</h2>
+            {property.amenities.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {property.amenities.map((amenity) => (
+                  <span key={amenity} className="rounded-md bg-muted px-3 py-1.5 text-sm text-muted-foreground">
+                    {amenity}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">No amenities listed.</p>
+            )}
+          </article>
+
+          <PropertyMap property={property} center={{ latitude: property.latitude, longitude: property.longitude }} zoom={15} />
+        </div>
       </div>
     </section>
   );

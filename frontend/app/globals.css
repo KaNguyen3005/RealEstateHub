@@ -79,6 +79,21 @@ a {
   text-decoration: none;
 }
 
+.property-map-marker {
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 0 5px hsl(var(--primary) / 0.18);
+}
+
+.property-map-marker span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: hsl(var(--primary-foreground));
+}
+
 @layer base {
   * {
     @apply border-border;

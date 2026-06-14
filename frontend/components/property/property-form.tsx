@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { LoadingButton } from "@/components/common/loading-button";
+import { ImageUploadBox } from "@/components/property/image-upload-box";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,12 +25,29 @@ interface PropertyFormProps {
 
 const fieldClassName = "mt-2 bg-background/90 shadow-sm shadow-black/5";
 
+function parseImageUrls(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+  }
+
+  if (typeof value !== "string") {
+    return [];
+  }
+
+  return value
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export function PropertyForm({ initialProperty, submitLabel, onSubmit }: PropertyFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<PropertyFormInput, unknown, PropertyFormValues>({
     resolver: zodResolver(propertySchema),
@@ -52,6 +70,7 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
       amenities: (initialProperty?.amenities ?? []).join(", "),
     },
   });
+  const imageUrls = parseImageUrls(watch("images"));
 
   const handleValidSubmit = handleSubmit(async (values) => {
     setSubmitError(null);
@@ -162,18 +181,24 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
         </div>
 
         <div className="md:col-span-2">
-          <Label htmlFor="images">Image URLs</Label>
-          <textarea
-            id="images"
-            rows={5}
-            placeholder="One image URL per line"
-            className={cn(
-              "mt-2 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none",
-              errors.images && "border-destructive"
-            )}
+          <Label>Images</Label>
+          <input
+            type="hidden"
             {...register("images")}
           />
-          {errors.images ? <p className="mt-2 text-sm text-destructive">{errors.images.message}</p> : null}
+          <div className="mt-2">
+            <ImageUploadBox
+              value={imageUrls}
+              onChange={(urls) => {
+                setValue("images", urls.join("\n"), {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true,
+                });
+              }}
+              error={errors.images?.message}
+            />
+          </div>
         </div>
 
         <div className="md:col-span-2">
