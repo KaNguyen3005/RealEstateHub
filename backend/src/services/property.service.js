@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Property = require("../models/Property");
 const { createHttpError } = require("../utils/httpError");
 
-const PROPERTY_ALLOWED_STATUSES = ["pending", "approved", "rejected", "hidden"];
+const PROPERTY_ALLOWED_STATUSES = ["pending", "approved", "rejected", "hidden", "sold", "rented"];
 const PROPERTY_UPDATABLE_FIELDS = [
   "title",
   "description",
@@ -310,8 +310,28 @@ function parsePagination(query = {}) {
   };
 }
 
-async function getProperties(query) {
-  const filter = buildPropertyQuery(query);
+async function getProperties(query, currentUser) {
+  const isMineQuery = String(query?.mine || "").toLowerCase() === "1";
+  const filter = isMineQuery
+    ? {
+        ownerId: currentUser?._id,
+      }
+    : buildPropertyQuery(query);
+
+  if (isMineQuery) {
+    if (!currentUser) {
+      throw createHttpError(401, "Authentication is required");
+    }
+
+    if (!["seller", "admin"].includes(currentUser.role)) {
+      throw createHttpError(403, "Only sellers and admins can view own properties");
+    }
+
+    if (query.status) {
+      filter.status = trimString(query.status);
+    }
+  }
+
   const { page, limit, skip } = parsePagination(query);
 
   const [items, totalItems] = await Promise.all([
@@ -396,15 +416,15 @@ async function createProperty(userId, payload) {
   }
 
   const normalizedPayload = normalizePropertyPayload(payload, { requireAllFields: true });
+  const propertyId = new mongoose.Types.ObjectId();
 
   const property = await Property.create({
+    _id: propertyId,
     ...normalizedPayload,
     ownerId: userId,
+    slug: buildSlug(normalizedPayload.title, String(propertyId).slice(-6)),
     status: "pending",
   });
-
-  property.slug = buildSlug(property.title, String(property._id).slice(-6));
-  await property.save();
 
   return await property.populate("ownerId", "fullName email role avatar");
 }

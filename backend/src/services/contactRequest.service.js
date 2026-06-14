@@ -25,8 +25,8 @@ function normalizeStringField(value, fieldName, { minLength = 1, maxLength } = {
   return normalized;
 }
 
-function normalizeContactRequestPayload(payload) {
-  const propertyId = String(payload?.propertyId || "").trim();
+function normalizeContactRequestPayload(payload = {}) {
+  const propertyId = String(payload.propertyId || "").trim();
 
   if (!propertyId) {
     throw createHttpError(400, "propertyId is required");
@@ -36,12 +36,21 @@ function normalizeContactRequestPayload(payload) {
     throw createHttpError(400, "Invalid propertyId");
   }
 
+  const email = normalizeStringField(payload.email, "email", {
+    minLength: 5,
+    maxLength: 160,
+  }).toLowerCase();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw createHttpError(400, "email is invalid");
+  }
+
   return {
     propertyId,
-    name: normalizeStringField(payload?.name, "name", { minLength: 2, maxLength: 120 }),
-    email: normalizeStringField(payload?.email, "email", { minLength: 5, maxLength: 160 }).toLowerCase(),
-    phone: normalizeStringField(payload?.phone, "phone", { minLength: 8, maxLength: 30 }),
-    message: normalizeStringField(payload?.message, "message", { minLength: 10, maxLength: 2000 }),
+    name: normalizeStringField(payload.name, "name", { minLength: 2, maxLength: 120 }),
+    email,
+    phone: normalizeStringField(payload.phone, "phone", { minLength: 8, maxLength: 30 }),
+    message: normalizeStringField(payload.message, "message", { minLength: 10, maxLength: 2000 }),
   };
 }
 
