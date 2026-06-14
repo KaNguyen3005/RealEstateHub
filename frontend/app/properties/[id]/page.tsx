@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Bath, BedDouble, MapPin, Ruler, UserRound } from "lucide-react";
 
+import { ContactRequestForm } from "@/components/property/contact-request-form";
 import { CompareButton } from "@/components/property/compare-button";
 import { FavoriteButton } from "@/components/property/favorite-button";
 import { PropertyGallery } from "@/components/property/property-gallery";
@@ -92,15 +93,27 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               <UserRound className="h-4 w-4 text-primary" />
               {getOwnerName(property.ownerId)}
             </p>
-            <p className="text-sm text-muted-foreground">Contact and realtime chat actions are added in later phases.</p>
+            <p className="text-sm text-muted-foreground">Send a request and the seller can follow up with you directly.</p>
           </div>
 
           <div className="flex flex-wrap gap-2">
             <CompareButton propertyId={property._id} />
             <FavoriteButton propertyId={property._id} />
-            <Button disabled={isClosed}>{isClosed ? "Unavailable" : "Contact seller"}</Button>
+            <Button asChild disabled={isClosed}>
+              <a href="#contact-request">{isClosed ? "Unavailable" : "Contact seller"}</a>
+            </Button>
           </div>
         </aside>
+      </div>
+
+      <div id="contact-request" className="mt-8 scroll-mt-24">
+        {isClosed ? (
+          <div className="rounded-lg border border-border/70 bg-muted/30 p-5 text-sm text-muted-foreground">
+            This property is no longer available for contact requests.
+          </div>
+        ) : (
+          <ContactRequestForm propertyId={property._id} />
+        )}
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.55fr]">
