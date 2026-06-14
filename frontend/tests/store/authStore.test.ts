@@ -54,6 +54,21 @@ describe("auth store", () => {
     });
   });
 
+  it("keeps authenticated state when bootstrap finishes after auth was restored", () => {
+    useAuthStore.getState().beginBootstrap();
+    useAuthStore.getState().setAuth(testUser, "access-token");
+    useAuthStore.getState().finishBootstrap();
+
+    expect(useAuthStore.getState()).toMatchObject({
+      user: testUser,
+      accessToken: "access-token",
+      status: "authenticated",
+      isAuthenticated: true,
+      isLoading: false,
+      hasBootstrapped: true,
+    });
+  });
+
   it("finishes bootstrap as guest when no authenticated state was set", () => {
     useAuthStore.getState().beginBootstrap();
     useAuthStore.getState().finishBootstrap();

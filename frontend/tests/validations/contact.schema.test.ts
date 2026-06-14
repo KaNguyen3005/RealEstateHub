@@ -42,4 +42,19 @@ describe("contact request validation schema", () => {
       expect(errors.message).toContain("Message must be at least 10 characters");
     }
   });
+
+  it("rejects whitespace-only property id after trimming input", () => {
+    const result = contactRequestSchema.safeParse({
+      propertyId: "   ",
+      name: "Buyer",
+      email: "buyer@example.com",
+      phone: "0901234567",
+      message: "I want to schedule a viewing.",
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.propertyId).toContain("Property is required");
+    }
+  });
 });

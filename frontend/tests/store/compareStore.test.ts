@@ -28,6 +28,14 @@ describe("compare store", () => {
     ]);
   });
 
+  it("keeps the compare list unchanged when removing an unknown property", () => {
+    useCompareStore.setState({ propertyIds: ["property-1", "property-2"] });
+
+    useCompareStore.getState().removeFromCompare("property-99");
+
+    expect(useCompareStore.getState().propertyIds).toEqual(["property-1", "property-2"]);
+  });
+
   it("removes property ids and clears the list", () => {
     useCompareStore.setState({ propertyIds: ["property-1", "property-2"] });
 

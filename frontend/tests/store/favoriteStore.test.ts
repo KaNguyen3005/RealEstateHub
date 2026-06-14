@@ -14,6 +14,14 @@ describe("favorite store", () => {
     expect(useFavoriteStore.getState().favoriteIds).toEqual(["property-1", "property-2"]);
   });
 
+  it("replaces stale favorite ids when backend favorites are loaded again", () => {
+    useFavoriteStore.setState({ favoriteIds: ["stale-property"] });
+
+    useFavoriteStore.getState().setFavorites(["property-3"]);
+
+    expect(useFavoriteStore.getState().favoriteIds).toEqual(["property-3"]);
+  });
+
   it("adds favorites without duplicates", () => {
     useFavoriteStore.getState().addFavorite("property-1");
     useFavoriteStore.getState().addFavorite("property-1");
