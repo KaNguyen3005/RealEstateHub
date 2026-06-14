@@ -40,7 +40,7 @@ export default function ComparePage() {
         }
       } catch (error) {
         if (isMounted) {
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load comparison.");
+          setErrorMessage(error instanceof Error ? error.message : "Không thể tải danh sách so sánh.");
         }
       } finally {
         if (isMounted) {
@@ -60,31 +60,31 @@ export default function ComparePage() {
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Compare</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Compare up to 3 properties</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">So sánh</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">So sánh tối đa 3 bất động sản</h1>
           <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Review price, location, area, and status side by side.
+            Đối chiếu giá cả, vị trí, diện tích và trạng thái của các dự án đặt cạnh nhau.
           </p>
         </div>
         {propertyIds.length > 0 ? (
           <Button type="button" variant="outline" onClick={clearCompare}>
-            Clear compare
+            Xóa danh sách so sánh
           </Button>
         ) : null}
       </div>
 
       {isLoading ? (
         <div className="flex min-h-[40vh] items-center justify-center">
-          <LoadingSpinner label="Loading comparison..." />
+          <LoadingSpinner label="Đang tải dữ liệu so sánh..." />
         </div>
       ) : errorMessage ? (
-        <EmptyState title="Comparison could not load" description={errorMessage} actionLabel="Browse properties" actionHref="/properties" />
+        <EmptyState title="Không thể tải dữ liệu so sánh" description={errorMessage} actionLabel="Khám phá nhà đất" actionHref="/properties" />
       ) : items.length === 0 ? (
-        <EmptyState title="No properties selected" description="Add properties from the listing page to compare them here." actionLabel="Browse properties" actionHref="/properties" />
+        <EmptyState title="Chưa chọn bất động sản nào" description="Hãy thêm các bất động sản từ trang danh sách để so sánh đối chiếu tại đây." actionLabel="Khám phá nhà đất" actionHref="/properties" />
       ) : (
         <div className="overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-sm">
           <div className="grid min-w-[760px]" style={{ gridTemplateColumns: `180px repeat(${items.length}, minmax(180px, 1fr))` }}>
-            <div className="border-b border-border/70 bg-muted/40 p-4 text-sm font-semibold">Field</div>
+            <div className="border-b border-border/70 bg-muted/40 p-4 text-sm font-semibold">Thông số</div>
             {items.map((item) => (
               <div key={item._id} className="border-b border-l border-border/70 p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -99,14 +99,14 @@ export default function ComparePage() {
             ))}
 
             {[
-              ["Status", (item: Property) => <PropertyStatusBadge status={item.status} />],
-              ["Price", (item: Property) => formatPrice(item.price, item.purpose)],
-              ["Purpose", (item: Property) => formatPropertyPurpose(item.purpose)],
-              ["Type", (item: Property) => formatPropertyType(item.type)],
-              ["Area", (item: Property) => `${item.area} m2`],
-              ["Bedrooms", (item: Property) => item.bedrooms],
-              ["Bathrooms", (item: Property) => item.bathrooms],
-              ["Address", (item: Property) => formatAddress(item)],
+              ["Trạng thái", (item: Property) => <PropertyStatusBadge status={item.status} />],
+              ["Mức giá", (item: Property) => formatPrice(item.price, item.purpose)],
+              ["Nhu cầu", (item: Property) => formatPropertyPurpose(item.purpose)],
+              ["Loại hình", (item: Property) => formatPropertyType(item.type)],
+              ["Diện tích", (item: Property) => `${item.area} m²`],
+              ["Phòng ngủ", (item: Property) => item.bedrooms],
+              ["Phòng tắm", (item: Property) => item.bathrooms],
+              ["Địa chỉ", (item: Property) => formatAddress(item)],
             ].map(([label, render]) => (
               <div key={String(label)} className="contents">
                 <div className="border-b border-border/70 bg-muted/30 p-4 text-sm font-semibold">{String(label)}</div>
