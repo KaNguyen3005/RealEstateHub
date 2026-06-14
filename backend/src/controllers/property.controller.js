@@ -3,7 +3,7 @@ const { successResponse } = require("../utils/apiResponse");
 const { createHttpError } = require("../utils/httpError");
 
 async function getProperties(req, res) {
-  const data = await propertyService.getProperties(req.query);
+  const data = await propertyService.getProperties(req.query, req.user);
 
   return res.status(200).json(
     successResponse("Properties retrieved successfully", data)

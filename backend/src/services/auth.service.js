@@ -139,15 +139,11 @@ async function refreshUserSession(refreshToken) {
   };
 
   const accessToken = createAccessToken(tokenPayload);
-  const newRefreshToken = createRefreshToken(tokenPayload);
-
-  user.refreshToken = newRefreshToken;
-  await user.save();
 
   return {
     user: user.toJSON(),
     accessToken,
-    refreshToken: newRefreshToken,
+    refreshToken,
   };
 }
 
