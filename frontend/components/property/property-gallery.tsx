@@ -72,12 +72,12 @@ export function PropertyGallery({ title, images }: PropertyGalleryProps) {
         type="button"
         className="group relative block aspect-[16/10] w-full overflow-hidden rounded-lg border border-border/70 bg-muted text-left"
         onClick={() => setViewerOpen(true)}
-        aria-label={`Open gallery for ${title}`}
+        aria-label={`Mở bộ sưu tập ảnh cho bài đăng ${title}`}
       >
         <img src={activeImage} alt={title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
         <span className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-md bg-background/90 px-3 py-2 text-xs font-semibold text-foreground shadow-sm">
           <Expand className="h-4 w-4" />
-          View photos
+          Xem hình ảnh
         </span>
       </button>
 
@@ -92,9 +92,9 @@ export function PropertyGallery({ title, images }: PropertyGalleryProps) {
                 activeIndex === index ? "border-primary ring-2 ring-primary/30" : "border-border/70 hover:border-primary/50"
               )}
               onClick={() => setActiveIndex(index)}
-              aria-label={`Show ${title} image ${index + 1}`}
+              aria-label={`Hiển thị hình ảnh ${index + 1} của bài đăng ${title}`}
             >
-              <img src={image} alt={`${title} image ${index + 1}`} className="h-full w-full object-cover" />
+              <img src={image} alt={`Hình ảnh ${index + 1} của bài đăng ${title}`} className="h-full w-full object-cover" />
             </button>
           ))}
         </div>
@@ -104,7 +104,7 @@ export function PropertyGallery({ title, images }: PropertyGalleryProps) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={`${title} photo viewer`}
+          aria-label={`Trình xem ảnh của bài đăng ${title}`}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4"
           onMouseDown={() => setViewerOpen(false)}
         >
@@ -115,7 +115,7 @@ export function PropertyGallery({ title, images }: PropertyGalleryProps) {
               variant="secondary"
               className="absolute right-0 top-0 z-10"
               onClick={() => setViewerOpen(false)}
-              aria-label="Close photo viewer"
+              aria-label="Đóng trình xem ảnh"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -127,7 +127,7 @@ export function PropertyGallery({ title, images }: PropertyGalleryProps) {
                 variant="secondary"
                 className="absolute left-0 z-10"
                 onClick={showPreviousImage}
-                aria-label="Show previous photo"
+                aria-label="Hiển thị hình ảnh trước đó"
               >
                 <ChevronLeft className="h-6 w-6" />
               </Button>
@@ -135,7 +135,7 @@ export function PropertyGallery({ title, images }: PropertyGalleryProps) {
 
             <img
               src={activeImage}
-              alt={`${title} image ${activeIndex + 1}`}
+              alt={`Hình ảnh ${activeIndex + 1} của bài đăng ${title}`}
               className="max-h-[88vh] max-w-[95vw] rounded-lg object-contain shadow-2xl"
             />
 
@@ -146,7 +146,7 @@ export function PropertyGallery({ title, images }: PropertyGalleryProps) {
                 variant="secondary"
                 className="absolute right-0 z-10"
                 onClick={showNextImage}
-                aria-label="Show next photo"
+                aria-label="Hiển thị hình ảnh tiếp theo"
               >
                 <ChevronRight className="h-6 w-6" />
               </Button>
