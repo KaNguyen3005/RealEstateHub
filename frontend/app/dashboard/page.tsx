@@ -6,24 +6,24 @@ import { Button } from "@/components/ui/button";
 const dashboardActions = [
   {
     href: "/dashboard/properties",
-    title: "My properties",
-    description: "Review submitted listings, approval status, and seller actions.",
+    title: "Bất động sản của tôi",
+    description: "Xem lại danh sách tin đăng, trạng thái phê duyệt và các thao tác quản lý.",
     icon: Building2,
-    cta: "Manage listings",
+    cta: "Quản lý tin đăng",
   },
   {
     href: "/dashboard/properties/new",
-    title: "New property",
-    description: "Create a listing and submit it for admin approval.",
+    title: "Đăng tin mới",
+    description: "Tạo mới một tin đăng bất động sản và gửi cho quản trị viên phê duyệt.",
     icon: Plus,
-    cta: "Create listing",
+    cta: "Tạo tin đăng",
   },
   {
     href: "/properties",
-    title: "Public marketplace",
-    description: "Check how approved properties appear to buyers and renters.",
+    title: "Sàn giao dịch công khai",
+    description: "Kiểm tra cách các tin đăng đã duyệt hiển thị trực quan tới người mua và thuê.",
     icon: Search,
-    cta: "View properties",
+    cta: "Xem danh sách",
   },
 ];
 
@@ -32,16 +32,16 @@ export default function DashboardPage() {
     <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Seller dashboard</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Kênh người bán</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Bảng điều khiển</h1>
           <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-            Manage listings from one focused workspace.
+            Quản lý các tin đăng bất động sản tập trung tại một không gian làm việc tối giản.
           </p>
         </div>
         <Button asChild>
           <Link href="/dashboard/properties/new">
             <Plus className="h-4 w-4" />
-            New property
+            Đăng tin mới
           </Link>
         </Button>
       </div>

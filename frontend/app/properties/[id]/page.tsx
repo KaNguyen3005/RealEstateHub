@@ -31,7 +31,7 @@ function getOwnerName(ownerId: unknown) {
     return (ownerId as Pick<User, "fullName">).fullName;
   }
 
-  return "Property seller";
+  return "Người đăng tin";
 }
 
 export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
@@ -47,7 +47,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-6">
         <Button asChild variant="ghost">
-          <Link href="/properties">Back to properties</Link>
+          <Link href="/properties">Quay lại danh sách</Link>
         </Button>
       </div>
 
@@ -77,15 +77,15 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
           <div className="grid grid-cols-3 gap-3 rounded-lg bg-muted/40 p-4 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-2">
               <Ruler className="h-4 w-4" />
-              {property.area} m2
+              {property.area} m²
             </span>
             <span className="inline-flex items-center gap-2">
               <BedDouble className="h-4 w-4" />
-              {property.bedrooms}
+              {property.bedrooms} PN
             </span>
             <span className="inline-flex items-center gap-2">
               <Bath className="h-4 w-4" />
-              {property.bathrooms}
+              {property.bathrooms} WC
             </span>
           </div>
 
@@ -94,14 +94,14 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               <UserRound className="h-4 w-4 text-primary" />
               {getOwnerName(property.ownerId)}
             </p>
-            <p className="text-sm text-muted-foreground">Send a request and the seller can follow up with you directly.</p>
+            <p className="text-sm text-muted-foreground">Gửi thông tin yêu cầu và người bán sẽ chủ động liên hệ lại trực tiếp với bạn.</p>
           </div>
 
           <div className="flex flex-wrap gap-2">
             <CompareButton propertyId={property._id} />
             <FavoriteButton propertyId={property._id} />
             <Button asChild disabled={isClosed}>
-              <a href="#contact-request">{isClosed ? "Unavailable" : "Contact seller"}</a>
+              <a href="#contact-request">{isClosed ? "Ngưng giao dịch" : "Liên hệ người bán"}</a>
             </Button>
             <StartChatButton propertyId={property._id} disabled={isClosed} />
           </div>
@@ -111,7 +111,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
       <div id="contact-request" className="mt-8 scroll-mt-24">
         {isClosed ? (
           <div className="rounded-lg border border-border/70 bg-muted/30 p-5 text-sm text-muted-foreground">
-            This property is no longer available for contact requests.
+            Bất động sản này đã đóng hoặc không còn nhận yêu cầu liên hệ.
           </div>
         ) : (
           <ContactRequestForm propertyId={property._id} />
@@ -120,13 +120,13 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.55fr]">
         <article className="rounded-lg border border-border/70 bg-background/90 p-5 shadow-sm">
-          <h2 className="text-xl font-semibold text-foreground">Description</h2>
+          <h2 className="text-xl font-semibold text-foreground">Mô tả chi tiết</h2>
           <p className="mt-3 whitespace-pre-line text-sm leading-7 text-muted-foreground">{property.description}</p>
         </article>
 
         <div className="space-y-6">
           <article className="rounded-lg border border-border/70 bg-background/90 p-5 shadow-sm">
-            <h2 className="text-xl font-semibold text-foreground">Amenities</h2>
+            <h2 className="text-xl font-semibold text-foreground">Tiện ích đi kèm</h2>
             {property.amenities.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-2">
                 {property.amenities.map((amenity) => (
@@ -136,7 +136,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 ))}
               </div>
             ) : (
-              <p className="mt-3 text-sm text-muted-foreground">No amenities listed.</p>
+              <p className="mt-3 text-sm text-muted-foreground">Chưa cập nhật danh mục tiện ích.</p>
             )}
           </article>
 

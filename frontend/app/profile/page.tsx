@@ -5,8 +5,8 @@ export default function ProfilePage() {
   return (
     <ProtectedRoute>
       <RoutePlaceholder
-        title="Profile"
-        description="Profile route created for Phase 5. User profile UI will be implemented later."
+        title="Trang cá nhân"
+        description="Định tuyến Trang cá nhân được khởi tạo cho Giai đoạn 5. Giao diện hồ sơ người dùng sẽ được triển khai chi tiết sau."
       />
     </ProtectedRoute>
   );

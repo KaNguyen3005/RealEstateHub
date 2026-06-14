@@ -21,7 +21,7 @@ export default async function PropertiesPage({ searchParams = {} }: PropertiesPa
       limit: searchParams.limit ?? "9",
     });
   } catch (error) {
-    errorMessage = error instanceof Error ? error.message : "Failed to load properties.";
+    errorMessage = error instanceof Error ? error.message : "Không thể tải danh sách bất động sản.";
     data = {
       items: [],
       page: 1,
@@ -39,16 +39,16 @@ export default async function PropertiesPage({ searchParams = {} }: PropertiesPa
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Properties</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">Bất động sản</p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Browse approved properties
+            Danh sách đã kiểm duyệt
           </h1>
           <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Search, filter, compare, and save homes that match your next move.
+            Tìm kiếm, sàng lọc, so sánh và lưu lại những không gian sống phù hợp với kế hoạch tiếp theo của bạn.
           </p>
         </div>
         <Button asChild variant="outline">
-          <Link href="/dashboard/properties/new">List a property</Link>
+          <Link href="/dashboard/properties/new">Đăng tin chính chủ</Link>
         </Button>
       </div>
 
@@ -56,15 +56,15 @@ export default async function PropertiesPage({ searchParams = {} }: PropertiesPa
         <PropertyFilter values={searchParams} />
 
         {errorMessage ? (
-          <EmptyState title="Properties could not load" description={errorMessage} actionLabel="Try again" actionHref="/properties" />
+          <EmptyState title="Không thể tải danh sách nhà đất" description={errorMessage} actionLabel="Thử lại" actionHref="/properties" />
         ) : data.items.length === 0 ? (
-          <EmptyState title="No properties found" description="Try changing the filters or search keyword." actionLabel="Clear filters" actionHref="/properties" />
+          <EmptyState title="Không tìm thấy bất động sản phù hợp" description="Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm khác." actionLabel="Xóa bộ lọc" actionHref="/properties" />
         ) : (
           <>
             <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>{data.totalItems} properties found</span>
+              <span>Tìm thấy {data.totalItems} bất động sản</span>
               <span>
-                Page {data.page} of {data.totalPages}
+                Trang {data.page} / {data.totalPages}
               </span>
             </div>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -75,10 +75,10 @@ export default async function PropertiesPage({ searchParams = {} }: PropertiesPa
 
             <div className="flex items-center justify-center gap-3">
               <Button asChild variant="outline" disabled={data.page <= 1}>
-                <Link href={`/properties${buildPropertyQuery({ ...baseParams, page: String(prevPage) })}`}>Previous</Link>
+                <Link href={`/properties${buildPropertyQuery({ ...baseParams, page: String(prevPage) })}`}>Trang trước</Link>
               </Button>
               <Button asChild variant="outline" disabled={data.page >= data.totalPages}>
-                <Link href={`/properties${buildPropertyQuery({ ...baseParams, page: String(nextPage) })}`}>Next</Link>
+                <Link href={`/properties${buildPropertyQuery({ ...baseParams, page: String(nextPage) })}`}>Trang sau</Link>
               </Button>
             </div>
           </>
