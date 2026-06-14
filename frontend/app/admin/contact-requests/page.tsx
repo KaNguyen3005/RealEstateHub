@@ -22,7 +22,7 @@ export default function AdminContactRequestsPage() {
     }
 
     if (!accessToken) {
-      setErrorMessage("Please login again before viewing contact requests.");
+      setErrorMessage("Vui lòng đăng nhập lại để xem các yêu cầu liên hệ.");
       setIsLoading(false);
       return;
     }
@@ -34,7 +34,7 @@ export default function AdminContactRequestsPage() {
       const data = await getAdminContactRequests(accessToken);
       setRequests(data.items);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Failed to load contact requests.");
+      setErrorMessage(error instanceof Error ? error.message : "Không thể tải danh sách yêu cầu liên hệ.");
     } finally {
       setIsLoading(false);
     }
@@ -47,16 +47,16 @@ export default function AdminContactRequestsPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-2xl font-semibold text-foreground">Contact requests</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Review requests submitted from property detail pages.</p>
+        <h2 className="text-2xl font-semibold text-foreground">Yêu cầu liên hệ</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Xem và kiểm tra các yêu cầu được gửi từ trang chi tiết bất động sản.</p>
       </div>
 
       {isLoading ? (
-        <LoadingSpinner label="Loading contact requests..." />
+        <LoadingSpinner label="Đang tải danh sách yêu cầu..." />
       ) : errorMessage ? (
-        <EmptyState title="Contact requests could not load" description={errorMessage} actionLabel="Try again" onAction={loadRequests} />
+        <EmptyState title="Không thể tải danh sách yêu cầu liên hệ" description={errorMessage} actionLabel="Thử lại" onAction={loadRequests} />
       ) : requests.length === 0 ? (
-        <EmptyState title="No contact requests" description="No buyers have submitted contact forms yet." />
+        <EmptyState title="Chưa có yêu cầu liên hệ nào" description="Hiện tại chưa có khách hàng nào gửi biểu mẫu liên hệ." />
       ) : (
         <ContactRequestTable requests={requests} />
       )}
