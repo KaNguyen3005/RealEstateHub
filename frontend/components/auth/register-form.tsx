@@ -62,11 +62,11 @@ export function RegisterForm() {
       });
 
       if (!response.data?.user || !response.data?.accessToken) {
-        throw new Error("Registration response is incomplete");
+        throw new Error("Phản hồi đăng ký không hợp lệ");
       }
 
       setAuth(response.data.user, response.data.accessToken);
-      setSubmitSuccess("Registration successful. Redirecting...");
+      setSubmitSuccess("Đăng ký thành công. Đang chuyển hướng...");
       reset({
         fullName: "",
         email: "",
@@ -79,9 +79,10 @@ export function RegisterForm() {
       router.replace(getRoleHomePath(response.data.user.role));
     } catch (error) {
       if (error instanceof ApiClientError) {
-        const message = error.message || "Registration failed";
+        const message = error.message || "Đăng ký thất bại";
 
-        if (error.status === 409 || message.toLowerCase().includes("email already exists")) {
+        // Kiểm tra mã lỗi 409 hoặc chuỗi text để map lỗi vào ô input Email
+        if (error.status === 409 || message.toLowerCase().includes("email already exists") || message.toLowerCase().includes("email đã tồn tại")) {
           setError("email", {
             type: "server",
             message,
@@ -92,7 +93,7 @@ export function RegisterForm() {
         return;
       }
 
-      setSubmitError("Registration failed. Please try again.");
+      setSubmitError("Đăng ký thất bại. Vui lòng thử lại sau.");
     }
   });
 
@@ -101,24 +102,24 @@ export function RegisterForm() {
       <div className="rounded-[28px] border border-border/70 bg-background/85 p-6 shadow-[0_20px_60px_rgba(53,36,20,0.08)] backdrop-blur-xl sm:p-8">
         <div className="mb-8 space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">
-            Create account
+            Tạo tài khoản
           </p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Register to RealEstateHub
+            Đăng ký RealEstateHub
           </h1>
           <p className="max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Create your account in a few quick steps.
+            Tạo tài khoản của bạn chỉ trong vài bước nhanh chóng.
           </p>
         </div>
 
         <form className="space-y-5" onSubmit={onSubmit} noValidate>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <Label htmlFor="fullName">Full name</Label>
+              <Label htmlFor="fullName">Họ và tên</Label>
               <Input
                 id="fullName"
                 type="text"
-                placeholder="Nguyen Van A"
+                placeholder="Nguyễn Văn A"
                 aria-invalid={Boolean(errors.fullName)}
                 className={cn(fieldBaseClass, errors.fullName && "border-destructive focus-visible:ring-destructive")}
                 {...register("fullName")}
@@ -133,7 +134,7 @@ export function RegisterForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="vi-du@example.com"
                 aria-invalid={Boolean(errors.email)}
                 className={cn(fieldBaseClass, errors.email && "border-destructive focus-visible:ring-destructive")}
                 {...register("email")}
@@ -142,7 +143,7 @@ export function RegisterForm() {
             </div>
 
             <div>
-              <Label htmlFor="phone">Phone number</Label>
+              <Label htmlFor="phone">Số điện thoại</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -155,29 +156,29 @@ export function RegisterForm() {
             </div>
 
             <div className="sm:col-span-2">
-              <Label htmlFor="role">Account type</Label>
+              <Label htmlFor="role">Loại tài khoản</Label>
               <select
                 id="role"
                 aria-invalid={Boolean(errors.role)}
                 className={cn(
                   fieldBaseClass,
-                  "flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none",
+                  "flex h-10 w-full rounded-md border px-3 py-2 text-sm outline-none bg-background",
                   errors.role && "border-destructive focus-visible:ring-destructive"
                 )}
                 {...register("role")}
               >
-                <option value="user">User</option>
-                <option value="seller">Seller</option>
+                <option value="user">Người tìm mua / thuê</option>
+                <option value="seller">Người đăng tin / Môi giới</option>
               </select>
               {errors.role ? <p className="mt-2 text-sm text-destructive">{errors.role.message}</p> : null}
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mật khẩu</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Minimum 8 characters"
+                placeholder="Tối thiểu 8 ký tự"
                 aria-invalid={Boolean(errors.password)}
                 className={cn(fieldBaseClass, errors.password && "border-destructive focus-visible:ring-destructive")}
                 {...register("password")}
@@ -188,11 +189,11 @@ export function RegisterForm() {
             </div>
 
             <div>
-              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Repeat your password"
+                placeholder="Nhập lại mật khẩu"
                 aria-invalid={Boolean(errors.confirmPassword)}
                 className={cn(
                   fieldBaseClass,
@@ -220,10 +221,10 @@ export function RegisterForm() {
 
           <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center">
             <LoadingButton type="submit" loading={isSubmitting} className="w-full sm:w-auto">
-              Create account
+              Đạo tài khoản
             </LoadingButton>
             <Button asChild type="button" variant="ghost" className="w-full sm:w-auto">
-              <Link href="/login">Already have an account?</Link>
+              <Link href="/login">Bạn đã có tài khoản?</Link>
             </Button>
           </div>
         </form>

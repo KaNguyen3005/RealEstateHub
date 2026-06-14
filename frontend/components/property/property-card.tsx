@@ -24,7 +24,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
   return (
     <article className="overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-sm shadow-black/5 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/10">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        <Link href={`/properties/${property._id}`} aria-label={`View details for ${property.title}`} className="group block h-full">
+        <Link href={`/properties/${property._id}`} aria-label={`Xem chi tiết bài đăng ${property.title}`} className="group block h-full">
           <img
             src={coverImage}
             alt={property.title}
@@ -60,21 +60,21 @@ export function PropertyCard({ property }: PropertyCardProps) {
         <div className="grid grid-cols-3 gap-2 rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <Ruler className="h-4 w-4" />
-            {property.area} m2
+            {property.area} m²
           </span>
           <span className="inline-flex items-center gap-1">
             <BedDouble className="h-4 w-4" />
-            {property.bedrooms}
+            {property.bedrooms} PN
           </span>
           <span className="inline-flex items-center gap-1">
             <Bath className="h-4 w-4" />
-            {property.bathrooms}
+            {property.bathrooms} WC
           </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild size="sm" className="flex-1">
-            <Link href={`/properties/${property._id}`}>View detail</Link>
+            <Link href={`/properties/${property._id}`}>Xem chi tiết</Link>
           </Button>
           <CompareButton propertyId={property._id} />
           <FavoriteButton propertyId={property._id} />

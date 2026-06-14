@@ -29,7 +29,7 @@ function SubmitButton({ disabled = false }: { disabled?: boolean }) {
   return (
     <Button type="submit" disabled={disabled || pending} className="w-full sm:w-auto">
       <Send className="h-4 w-4" />
-      {pending ? "Sending..." : "Send request"}
+      {pending ? "Đang gửi..." : "Gửi yêu cầu"}
     </Button>
   );
 }
@@ -56,15 +56,15 @@ export function ContactRequestForm({ propertyId, disabled = false }: ContactRequ
       <input type="hidden" name="accessToken" value={accessToken ?? ""} />
 
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Contact seller</h2>
+        <h2 className="text-xl font-semibold text-foreground">Liên hệ người bán</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Send your contact details and question to the seller. Guests can submit this form too.
+          Gửi thông tin liên hệ và câu hỏi của bạn cho người bán. Khách truy cập chưa đăng nhập vẫn có thể gửi form này.
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="contact-name">Name</Label>
+          <Label htmlFor="contact-name">Họ và tên</Label>
           <Input
             id="contact-name"
             name="name"
@@ -93,7 +93,7 @@ export function ContactRequestForm({ propertyId, disabled = false }: ContactRequ
         </div>
 
         <div className="sm:col-span-2">
-          <Label htmlFor="contact-phone">Phone</Label>
+          <Label htmlFor="contact-phone">Số điện thoại</Label>
           <Input
             id="contact-phone"
             name="phone"
@@ -107,13 +107,13 @@ export function ContactRequestForm({ propertyId, disabled = false }: ContactRequ
         </div>
 
         <div className="sm:col-span-2">
-          <Label htmlFor="contact-message">Message</Label>
+          <Label htmlFor="contact-message">Lời nhắn</Label>
           <textarea
             id="contact-message"
             name="message"
             rows={4}
             disabled={disabled}
-            placeholder="I am interested in this property. Please contact me with more details."
+            placeholder="Tôi quan tâm đến bất động sản này. Vui lòng liên hệ và cung cấp thêm thông tin chi tiết cho tôi."
             className="mt-2 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
           {firstError(state.fieldErrors?.message) ? (
