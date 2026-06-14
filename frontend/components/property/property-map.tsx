@@ -11,9 +11,16 @@ export interface PropertyMapProps {
     latitude: number;
     longitude: number;
   };
+  selectedLocation?: {
+    latitude: number;
+    longitude: number;
+  };
   property?: Property;
   zoom?: number;
   className?: string;
+  selectable?: boolean;
+  emptyMessage?: string;
+  onLocationSelect?: (location: { latitude: number; longitude: number }) => void;
 }
 
 const LeafletPropertyMap = dynamic(() => import("@/components/property/property-map-leaflet"), {
@@ -29,22 +36,40 @@ function hasValidCoordinates(latitude?: number, longitude?: number) {
   return Number.isFinite(latitude) && Number.isFinite(longitude);
 }
 
-export function PropertyMap({ properties = [], center, property, zoom = 13, className }: PropertyMapProps) {
+export function PropertyMap({
+  properties = [],
+  center,
+  selectedLocation,
+  property,
+  zoom = 13,
+  className,
+  selectable = false,
+  emptyMessage = "Map is unavailable because this property does not have coordinates yet.",
+  onLocationSelect,
+}: PropertyMapProps) {
   const markerProperties = property ? [property] : properties;
   const hasMarkers = markerProperties.some((item) => hasValidCoordinates(item.latitude, item.longitude));
   const hasCenter = hasValidCoordinates(center?.latitude, center?.longitude);
+  const hasSelectedLocation = hasValidCoordinates(selectedLocation?.latitude, selectedLocation?.longitude);
 
-  if (!hasMarkers && !hasCenter) {
+  if (!selectable && !hasMarkers && !hasCenter && !hasSelectedLocation) {
     return (
       <div className={cn("rounded-lg border border-border bg-muted/30 p-5 text-sm leading-6 text-muted-foreground", className)}>
-        Map is unavailable because this property does not have coordinates yet.
+        {emptyMessage}
       </div>
     );
   }
 
   return (
     <div className={cn("overflow-hidden rounded-lg border border-border bg-background shadow-sm", className)}>
-      <LeafletPropertyMap properties={markerProperties} center={center} zoom={zoom} />
+      <LeafletPropertyMap
+        properties={markerProperties}
+        center={center}
+        selectedLocation={selectedLocation}
+        zoom={zoom}
+        selectable={selectable}
+        onLocationSelect={onLocationSelect}
+      />
     </div>
   );
 }

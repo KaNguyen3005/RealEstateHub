@@ -4,12 +4,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { MapPin, Search } from "lucide-react";
 
 import { LoadingButton } from "@/components/common/loading-button";
 import { ImageUploadBox } from "@/components/property/image-upload-box";
+import { PropertyMap } from "@/components/property/property-map";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { geocodePropertyAddress } from "@/lib/geocoding";
 import { cn } from "@/lib/utils";
 import {
   propertySchema,
@@ -26,24 +29,17 @@ interface PropertyFormProps {
 
 const fieldClassName = "mt-2 bg-background/90 shadow-sm shadow-black/5";
 
-function parseImageUrls(value: unknown) {
-  if (Array.isArray(value)) {
-    return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
-  }
-
-  if (typeof value !== "string") {
-    return [];
-  }
-
-  return value
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
+function parseCoordinate(value: unknown) {
+  const coordinate = Number(value);
+  return Number.isFinite(coordinate) ? coordinate : undefined;
 }
 
 export function PropertyForm({ initialProperty, submitLabel, onSubmit }: PropertyFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationSuccess, setLocationSuccess] = useState<string | null>(null);
+  const [isFindingLocation, setIsFindingLocation] = useState(false);
   const {
     register,
     handleSubmit,
@@ -65,13 +61,64 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
       city: initialProperty?.city ?? "",
       district: initialProperty?.district ?? "",
       ward: initialProperty?.ward ?? "",
-      latitude: initialProperty?.latitude ?? 10.7769,
-      longitude: initialProperty?.longitude ?? 106.7009,
+      latitude: initialProperty?.latitude,
+      longitude: initialProperty?.longitude,
       images: initialProperty?.images ?? [],
       amenities: (initialProperty?.amenities ?? []).join(", "),
     },
   });
   const imageUrls = watch("images") ?? [];
+  const address = watch("address");
+  const city = watch("city");
+  const district = watch("district");
+  const ward = watch("ward");
+  const latitude = parseCoordinate(watch("latitude"));
+  const longitude = parseCoordinate(watch("longitude"));
+  const selectedLocation =
+    typeof latitude === "number" && typeof longitude === "number"
+      ? {
+          latitude,
+          longitude,
+        }
+      : undefined;
+
+  const updateLocation = (location: { latitude: number; longitude: number }) => {
+    setValue("latitude", location.latitude, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue("longitude", location.longitude, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+  };
+
+  const handleFindLocation = async () => {
+    setLocationError(null);
+    setLocationSuccess(null);
+    setIsFindingLocation(true);
+
+    try {
+      const result = await geocodePropertyAddress({
+        address,
+        city,
+        district,
+        ward,
+      });
+
+      updateLocation({
+        latitude: result.latitude,
+        longitude: result.longitude,
+      });
+      setLocationSuccess(result.label);
+    } catch (error) {
+      setLocationError(error instanceof Error ? error.message : "Location lookup failed.");
+    } finally {
+      setIsFindingLocation(false);
+    }
+  };
 
   const handleValidSubmit = handleSubmit(async (values) => {
     setSubmitError(null);
@@ -175,16 +222,62 @@ export function PropertyForm({ initialProperty, submitLabel, onSubmit }: Propert
           <Input id="ward" className={fieldClassName} {...register("ward")} />
         </div>
 
-        <div>
-          <Label htmlFor="latitude">Latitude</Label>
-          <Input id="latitude" type="number" step="any" className={fieldClassName} {...register("latitude")} />
-          {errors.latitude ? <p className="mt-2 text-sm text-destructive">{errors.latitude.message}</p> : null}
-        </div>
+        <div className="md:col-span-2">
+          <input type="hidden" {...register("latitude")} />
+          <input type="hidden" {...register("longitude")} />
 
-        <div>
-          <Label htmlFor="longitude">Longitude</Label>
-          <Input id="longitude" type="number" step="any" className={fieldClassName} {...register("longitude")} />
-          {errors.longitude ? <p className="mt-2 text-sm text-destructive">{errors.longitude.message}</p> : null}
+          <div className="rounded-lg border border-border/70 bg-muted/20 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <Label>Property location</Label>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  Find the location from the address, then click the map if the marker needs adjustment.
+                </p>
+              </div>
+              <Button type="button" variant="outline" onClick={handleFindLocation} disabled={isFindingLocation}>
+                {isFindingLocation ? (
+                  <>
+                    <Search className="h-4 w-4 animate-pulse" />
+                    Finding...
+                  </>
+                ) : (
+                  <>
+                    <MapPin className="h-4 w-4" />
+                    Find location
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="mt-4">
+              <PropertyMap
+                selectable
+                selectedLocation={selectedLocation}
+                center={selectedLocation}
+                zoom={selectedLocation ? 15 : 11}
+                className="border-border/70"
+                onLocationSelect={(location) => {
+                  updateLocation(location);
+                  setLocationError(null);
+                  setLocationSuccess("Location selected from the map.");
+                }}
+              />
+            </div>
+
+            <div className="mt-3 space-y-1 text-sm">
+              {selectedLocation ? (
+                <p className="text-muted-foreground">
+                  Selected coordinates: {selectedLocation.latitude.toFixed(6)}, {selectedLocation.longitude.toFixed(6)}
+                </p>
+              ) : (
+                <p className="text-muted-foreground">No location selected yet.</p>
+              )}
+              {locationSuccess ? <p className="text-emerald-700">{locationSuccess}</p> : null}
+              {locationError ? <p className="text-destructive">{locationError}</p> : null}
+              {errors.latitude ? <p className="text-destructive">{errors.latitude.message}</p> : null}
+              {errors.longitude ? <p className="text-destructive">{errors.longitude.message}</p> : null}
+            </div>
+          </div>
         </div>
 
         <div className="md:col-span-2">

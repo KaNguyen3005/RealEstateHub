@@ -28,8 +28,12 @@ export const propertySchema = z.object({
   city: z.string().trim().min(1, "City is required"),
   district: z.string().trim().optional(),
   ward: z.string().trim().optional(),
-  latitude: z.coerce.number(),
-  longitude: z.coerce.number(),
+  latitude: z.coerce.number({
+    message: "Please confirm the property location on the map",
+  }),
+  longitude: z.coerce.number({
+    message: "Please confirm the property location on the map",
+  }),
   images: z
     .array(z.string().url("Each image must be uploaded successfully"))
     .min(1, "Upload at least 1 image")
