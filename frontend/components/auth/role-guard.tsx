@@ -40,25 +40,25 @@ export function RoleGuard({
     <ProtectedRoute>
       {isResolvingAuth ? (
         <section className="mx-auto flex min-h-[50vh] w-full max-w-5xl items-center justify-center px-4 py-16">
-          <LoadingSpinner label="Checking your permissions..." />
+          <LoadingSpinner label="Đang kiểm tra quyền truy cập của bạn..." />
         </section>
       ) : isAllowed ? (
         children
       ) : (
         <section className="mx-auto flex min-h-[50vh] w-full max-w-5xl flex-col items-start justify-center gap-4 px-4 py-16 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/80">
-            Access restricted
+            Truy cập bị hạn chế
           </p>
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-              You do not have permission to view this page.
+              Bạn không có quyền xem trang này.
             </h1>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-              This area is limited to specific account roles.
+              Khu vực này chỉ giới hạn cho một số vai trò tài khoản cụ thể.
             </p>
           </div>
           <Button type="button" onClick={() => router.replace(fallbackPath)}>
-            Go back
+            Quay lại
           </Button>
         </section>
       )}

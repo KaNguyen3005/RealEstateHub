@@ -18,7 +18,7 @@ interface ChatWindowProps {
 }
 
 function getConversationTitle(conversation: ChatConversation) {
-  return typeof conversation.propertyId === "string" ? "Conversation" : conversation.propertyId.title;
+  return typeof conversation.propertyId === "string" ? "Cuộc trò chuyện" : conversation.propertyId.title;
 }
 
 export function ChatWindow({ conversation, accessToken, currentUserId, onMessageSent }: ChatWindowProps) {
@@ -54,7 +54,7 @@ export function ChatWindow({ conversation, accessToken, currentUserId, onMessage
         }
       } catch (error) {
         if (isMounted) {
-          setErrorMessage(error instanceof Error ? error.message : "Failed to load messages.");
+          setErrorMessage(error instanceof Error ? error.message : "Tải tin nhắn thất bại.");
         }
       } finally {
         if (isMounted) {
@@ -136,8 +136,8 @@ export function ChatWindow({ conversation, accessToken, currentUserId, onMessage
     return (
       <div className="grid min-h-[520px] place-items-center rounded-lg border border-border/70 bg-background/90 p-6 text-center">
         <div>
-          <p className="text-lg font-semibold text-foreground">Select a conversation</p>
-          <p className="mt-2 text-sm text-muted-foreground">Choose a conversation from the list to start messaging.</p>
+          <p className="text-lg font-semibold text-foreground">Chọn một cuộc trò chuyện</p>
+          <p className="mt-2 text-sm text-muted-foreground">Hãy chọn một cuộc trò chuyện từ danh sách để bắt đầu nhắn tin.</p>
         </div>
       </div>
     );
@@ -147,15 +147,15 @@ export function ChatWindow({ conversation, accessToken, currentUserId, onMessage
     <section className="flex min-h-[620px] flex-col rounded-lg border border-border/70 bg-background/90 shadow-sm">
       <header className="border-b border-border/70 p-4">
         <p className="text-sm font-semibold text-foreground">{getConversationTitle(conversation)}</p>
-        <p className="mt-1 text-xs text-muted-foreground">Realtime messages are saved to this property conversation.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Tin nhắn thời gian thực được lưu vào cuộc hội thoại của bất động sản này.</p>
       </header>
 
       <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {isLoading ? (
-          <LoadingSpinner label="Loading messages..." />
+          <LoadingSpinner label="Đang tải tin nhắn..." />
         ) : messages.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border bg-muted/20 p-5 text-center text-sm text-muted-foreground">
-            No messages yet. Send the first one.
+            Chưa có tin nhắn nào. Hãy gửi tin nhắn đầu tiên.
           </div>
         ) : (
           messages.map((message) => (
@@ -172,12 +172,12 @@ export function ChatWindow({ conversation, accessToken, currentUserId, onMessage
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           rows={2}
-          placeholder="Write a message..."
+          placeholder="Nhập tin nhắn..."
           className="min-h-12 flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         />
         <Button type="submit" disabled={isSending || draft.trim().length === 0}>
           <Send className="h-4 w-4" />
-          {isSending ? "Sending..." : "Send"}
+          {isSending ? "Đang gửi..." : "Gửi"}
         </Button>
       </form>
     </section>

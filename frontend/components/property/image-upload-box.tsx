@@ -37,12 +37,12 @@ export function ImageUploadBox({ value, onChange, errorMessage }: ImageUploadBox
     setUploadError(null);
 
     if (!accessToken) {
-      setUploadError("Please login again before uploading images.");
+      setUploadError("Vui lòng đăng nhập lại trước khi tải ảnh lên.");
       return;
     }
 
     if (remainingSlots <= 0) {
-      setUploadError("You can upload up to 10 images.");
+      setUploadError("Bạn chỉ có thể tải lên tối đa 10 hình ảnh.");
       return;
     }
 
@@ -53,7 +53,7 @@ export function ImageUploadBox({ value, onChange, errorMessage }: ImageUploadBox
       const uploadedUrls = await uploadPropertyImages(filesToUpload, accessToken);
       onChange([...value, ...uploadedUrls].slice(0, MAX_IMAGES));
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : "Image upload failed. Please try another image.");
+      setUploadError(error instanceof Error ? error.message : "Tải ảnh lên thất bại. Vui lòng thử lại với ảnh khác.");
     } finally {
       setIsUploading(false);
     }
@@ -82,9 +82,9 @@ export function ImageUploadBox({ value, onChange, errorMessage }: ImageUploadBox
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-foreground">Property images</p>
+            <p className="text-sm font-semibold text-foreground">Hình ảnh bất động sản</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Upload 1-10 images. JPEG, PNG, and WEBP are supported.
+              Tải lên từ 1-10 ảnh. Hỗ trợ định dạng JPEG, PNG và WEBP.
             </p>
           </div>
           <Button
@@ -94,24 +94,24 @@ export function ImageUploadBox({ value, onChange, errorMessage }: ImageUploadBox
             onClick={() => inputRef.current?.click()}
           >
             <ImagePlus className="h-4 w-4" />
-            {isUploading ? "Uploading..." : "Upload images"}
+            {isUploading ? "Đang tải lên..." : "Tải ảnh lên"}
           </Button>
         </div>
 
-        <p className="mt-3 text-xs text-muted-foreground">{value.length} / {MAX_IMAGES} images uploaded</p>
+        <p className="mt-3 text-xs text-muted-foreground">Đã tải lên {value.length} / {MAX_IMAGES} ảnh</p>
 
         {value.length > 0 ? (
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {value.map((imageUrl) => (
               <div key={imageUrl} className="group relative aspect-[4/3] overflow-hidden rounded-md border border-border/70 bg-muted">
-                <img src={imageUrl} alt="Uploaded property" className="h-full w-full object-cover" />
+                <img src={imageUrl} alt="Bất động sản đã tải lên" className="h-full w-full object-cover" />
                 <Button
                   type="button"
                   size="icon"
                   variant="destructive"
                   className="absolute right-2 top-2 h-8 w-8 opacity-100 sm:opacity-0 sm:transition sm:group-hover:opacity-100"
                   onClick={() => removeImage(imageUrl)}
-                  aria-label="Remove uploaded image"
+                  aria-label="Xóa ảnh này"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
